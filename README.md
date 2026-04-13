@@ -7,7 +7,13 @@ API de suporte a sessões terapêuticas e educacionais voltada para profissionai
 
 ## :technologist: Membros da equipe
 
-Matrícula, nome e curso dos participantes.
+Membro 1: 
+Nome/Matrícula: Matheus dos Santos Rodrigues - 563640 
+Curso: Engenharia de Software
+
+Membro 2: 
+Nome/Matrícula: Natan de Sousa Lucena - 563641 
+Curso: Engenharia de Software
 
 ## :bulb: Objetivo Geral
 
