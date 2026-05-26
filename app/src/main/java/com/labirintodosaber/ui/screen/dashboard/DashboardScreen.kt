@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,25 +20,29 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.Calculate
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,10 +67,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
-import com.labirintodosaber.ui.theme.GradientBottom
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
 import com.labirintodosaber.ui.theme.TextPrimary
@@ -73,6 +78,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun DashboardScreen(
+    onStudentsClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
@@ -80,6 +86,7 @@ fun DashboardScreen(
     DashboardContent(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onStudentsClick = onStudentsClick,
         modifier = modifier,
     )
 }
@@ -89,6 +96,7 @@ fun DashboardScreen(
 private fun DashboardContent(
     uiState: DashboardUiState,
     onAction: (DashboardAction) -> Unit,
+    onStudentsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -99,7 +107,6 @@ private fun DashboardContent(
                     Text(
                         text = stringResource(R.string.dashboard_title),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
                         color = TextPrimary,
                     )
                 },
@@ -131,9 +138,10 @@ private fun DashboardContent(
             DashboardBottomBar(
                 selectedTab = uiState.selectedTab,
                 onTabSelect = { onAction(DashboardAction.OnTabSelect(it)) },
+                onStudentsClick = onStudentsClick,
             )
         },
-        containerColor = GradientBottom,
+        containerColor = Color.White,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -141,27 +149,32 @@ private fun DashboardContent(
                 .padding(padding)
                 .verticalScroll(rememberScrollState()),
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             WelcomeBanner(
                 userName = uiState.userName,
+                sessionCount = uiState.todaySessionCount,
                 onStartSession = { onAction(DashboardAction.OnStartSession) },
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = stringResource(R.string.dashboard_recent_sessions),
-                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(R.string.dashboard_today_sessions),
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-            Spacer(modifier = Modifier.height(12.dp))
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(uiState.recentSessions) { session ->
+                items(uiState.todaySessions) { session ->
                     SessionCard(
                         session = session,
                         onClick = { onAction(DashboardAction.OnSessionClick(session.id)) },
@@ -171,33 +184,14 @@ private fun DashboardContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.dashboard_recent_activities),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        uiState.recentActivities.forEach { activity ->
-                            ActivityCard(
-                                activity = activity,
-                                onClick = { onAction(DashboardAction.OnActivityClick(activity.id)) },
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
-                    }
-                }
-            }
+            PastSessionsCard(
+                pastSessions = uiState.pastSessions,
+                activities = uiState.recentActivities,
+                onSeeAll = { onAction(DashboardAction.OnSeeAllSessionsClick) },
+                onPastSessionClick = { onAction(DashboardAction.OnPastSessionClick(it)) },
+                onActivityClick = { onAction(DashboardAction.OnActivityClick(it)) },
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -209,18 +203,20 @@ private fun DashboardContent(
 @Composable
 private fun WelcomeBanner(
     userName: String,
+    sessionCount: Int,
     onStartSession: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.horizontalGradient(colors = listOf(TealPrimary, TealLight)),
-            )
-            .padding(horizontal = 20.dp, vertical = 18.dp),
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = TealPrimary),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -231,8 +227,9 @@ private fun WelcomeBanner(
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = stringResource(R.string.dashboard_welcome_sub),
+                    text = stringResource(R.string.dashboard_sessions_subtitle, sessionCount),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.9f),
                 )
@@ -240,18 +237,20 @@ private fun WelcomeBanner(
             Spacer(modifier = Modifier.width(12.dp))
             Surface(
                 onClick = onStartSession,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = Color.White,
+                shadowElevation = 2.dp,
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.PlayArrow,
                         contentDescription = null,
                         tint = TealPrimary,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(14.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -266,7 +265,7 @@ private fun WelcomeBanner(
     }
 }
 
-// ── Session Card ──────────────────────────────────────────────────────────────
+// ── Session Card (Sessões de hoje) ────────────────────────────────────────────
 
 @Composable
 private fun SessionCard(
@@ -276,83 +275,257 @@ private fun SessionCard(
 ) {
     val borderColor = Color(session.borderColorHex)
 
-    Card(
+    Row(
         modifier = modifier
-            .width(192.dp)
+            .width(220.dp)
+            .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(13.dp))
+            .background(Color(0xFFF6F8F8))
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Row {
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .fillMaxHeight()
-                    .background(borderColor),
-            )
-            Column(modifier = Modifier.padding(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(
-                            if (session.isGirl) R.drawable.girl_home else R.drawable.boy_home
-                        ),
-                        contentDescription = stringResource(R.string.dashboard_student_avatar_desc),
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Fit,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = session.studentName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Outlined.AccessTime,
-                        contentDescription = null,
-                        tint = TextSecondary,
-                        modifier = Modifier.size(12.dp),
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = session.time,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
-                    )
-                }
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Outlined.GridView,
-                        contentDescription = null,
-                        tint = TextSecondary,
-                        modifier = Modifier.size(12.dp),
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = session.category,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
+        Box(
+            modifier = Modifier
+                .width(3.dp)
+                .fillMaxHeight()
+                .background(borderColor),
+        )
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(
+                        if (session.isGirl) R.drawable.girl_home else R.drawable.boy_home,
+                    ),
+                    contentDescription = stringResource(R.string.dashboard_student_avatar_desc),
+                    modifier = Modifier
+                        .size(33.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = session.description,
+                    text = session.studentName,
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
-                    maxLines = 2,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.AccessTime,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(10.dp),
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = session.time,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextSecondary,
+                )
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.GridView,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(10.dp),
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = session.category,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextSecondary,
+                )
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = session.description,
+                style = MaterialTheme.typography.labelSmall,
+                color = TextSecondary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
+    }
+}
+
+// ── Past Sessions + Activities Card ───────────────────────────────────────────
+
+@Composable
+private fun PastSessionsCard(
+    pastSessions: List<PastSessionItem>,
+    activities: List<ActivityItem>,
+    onSeeAll: () -> Unit,
+    onPastSessionClick: (Int) -> Unit,
+    onActivityClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.dashboard_recent_sessions),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                )
+                Text(
+                    text = stringResource(R.string.dashboard_see_all),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = TealPrimary,
+                    modifier = Modifier.clickable { onSeeAll() },
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            pastSessions.forEachIndexed { index, session ->
+                PastSessionRow(
+                    session = session,
+                    onClick = { onPastSessionClick(session.id) },
+                )
+                if (index < pastSessions.lastIndex) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Text(
+                text = stringResource(R.string.dashboard_recent_activities),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                activities.forEach { activity ->
+                    ActivityCard(
+                        activity = activity,
+                        onClick = { onActivityClick(activity.id) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PastSessionRow(
+    session: PastSessionItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                Brush.horizontalGradient(
+                    colors = listOf(Color(0xFFF6F8F8), Color(0xFFFAFBFB), Color.White),
+                ),
+            )
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            painter = painterResource(
+                if (session.isGirl) R.drawable.girl_home else R.drawable.boy_home,
+            ),
+            contentDescription = stringResource(R.string.dashboard_student_avatar_desc),
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop,
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = session.studentName,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.CalendarToday,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(8.dp),
+                )
+                Text(
+                    text = session.date,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 9.sp,
+                    color = TextSecondary,
+                )
+                Icon(
+                    imageVector = Icons.Outlined.AccessTime,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(8.dp),
+                )
+                Text(
+                    text = "${session.time} • ${session.duration}",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 9.sp,
+                    color = TextSecondary,
+                )
+                TagChip(label = session.category)
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = stringResource(R.string.dashboard_hit_rate_label),
+                style = MaterialTheme.typography.labelSmall,
+                fontSize = 7.sp,
+                color = TextSecondary,
+            )
+            Text(
+                text = "${session.hitRatePercent}%",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = TealPrimary,
+            )
+        }
+
+        Spacer(modifier = Modifier.width(4.dp))
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+            contentDescription = stringResource(R.string.dashboard_session_detail_desc),
+            tint = TextSecondary,
+            modifier = Modifier.size(16.dp),
+        )
     }
 }
 
@@ -365,12 +538,12 @@ private fun ActivityCard(
     modifier: Modifier = Modifier,
 ) {
     val bgColor = Color(activity.backgroundColorHex)
+    val iconColor = Color(activity.iconColorHex)
     val icon = when (activity.iconType) {
-        ActivityIconType.BOOK -> Icons.Outlined.MenuBook
+        ActivityIconType.BOOK -> Icons.AutoMirrored.Outlined.MenuBook
         ActivityIconType.CALCULATE -> Icons.Outlined.Calculate
         ActivityIconType.EDIT -> Icons.Outlined.Edit
     }
-    val iconTint = Color(activity.tags.firstOrNull()?.colorHex ?: 0xFF5CC8C0)
 
     Column(
         modifier = modifier
@@ -379,18 +552,28 @@ private fun ActivityCard(
             .clickable { onClick() }
             .padding(10.dp),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconTint,
-            modifier = Modifier.size(24.dp),
-        )
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            shadowElevation = 1.dp,
+            modifier = Modifier.size(26.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(14.dp),
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = activity.name,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = TextPrimary,
+            fontSize = 9.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -399,29 +582,35 @@ private fun ActivityCard(
             text = activity.description,
             style = MaterialTheme.typography.labelSmall,
             color = TextSecondary,
+            fontSize = 7.sp,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.height(8.dp))
         activity.tags.forEach { tag ->
-            ActivityTagChip(tag = tag)
+            TagChip(label = tag.label)
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
 
 @Composable
-private fun ActivityTagChip(tag: ActivityTag) {
-    val tagColor = Color(tag.colorHex)
-    Box(
-        modifier = Modifier
-            .background(tagColor.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
-            .padding(horizontal = 8.dp, vertical = 2.dp),
+private fun TagChip(
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(50.dp),
+        color = Color.White,
+        shadowElevation = 1.dp,
     ) {
         Text(
-            text = tag.label,
+            text = label,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,
-            color = tagColor,
+            fontSize = 6.sp,
+            color = TextSecondary,
         )
     }
 }
@@ -432,14 +621,15 @@ private fun ActivityTagChip(tag: ActivityTag) {
 private fun DashboardBottomBar(
     selectedTab: DashboardTab,
     onTabSelect: (DashboardTab) -> Unit,
+    onStudentsClick: () -> Unit,
 ) {
     data class TabItem(val tab: DashboardTab, val label: Int, val icon: ImageVector, val iconFilled: ImageVector)
 
     val tabs = listOf(
         TabItem(DashboardTab.HOME, R.string.dashboard_tab_home, Icons.Outlined.Home, Icons.Filled.Home),
-        TabItem(DashboardTab.ACTIVITIES, R.string.dashboard_tab_activities, Icons.Outlined.MenuBook, Icons.Outlined.MenuBook),
+        TabItem(DashboardTab.ACTIVITIES, R.string.dashboard_tab_activities, Icons.AutoMirrored.Outlined.MenuBook, Icons.AutoMirrored.Outlined.MenuBook),
         TabItem(DashboardTab.STUDENTS, R.string.dashboard_tab_students, Icons.Outlined.Person, Icons.Outlined.Person),
-        TabItem(DashboardTab.REPORTS, R.string.dashboard_tab_reports, Icons.Outlined.Assignment, Icons.Outlined.Assignment),
+        TabItem(DashboardTab.REPORTS, R.string.dashboard_tab_reports, Icons.AutoMirrored.Outlined.Assignment, Icons.AutoMirrored.Outlined.Assignment),
     )
 
     NavigationBar(
@@ -450,7 +640,10 @@ private fun DashboardBottomBar(
             val selected = selectedTab == item.tab
             NavigationBarItem(
                 selected = selected,
-                onClick = { onTabSelect(item.tab) },
+                onClick = {
+                    if (item.tab == DashboardTab.STUDENTS) onStudentsClick()
+                    else onTabSelect(item.tab)
+                },
                 icon = {
                     Icon(
                         imageVector = if (selected) item.iconFilled else item.icon,

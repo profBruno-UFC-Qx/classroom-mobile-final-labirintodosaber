@@ -72,13 +72,63 @@
     <string name="forgot_password_icon_desc">Ícone de senha</string>
     <string name="forgot_toggle_password_desc">Alternar visibilidade da senha</string>
 
+    <!-- Students -->
+    <string name="students_title">Alunos</string>
+    <string name="students_add_button">Cadastrar Aluno</string>
+    <string name="students_search_placeholder">Buscar aluno por nome...</string>
+    <string name="students_count_label">Alunos organizados em ordem alfabética (%1$d alunos)</string>
+    <string name="students_progress_label">Progresso Geral</string>
+    <string name="students_avatar_desc">Foto do aluno</string>
+
+    <!-- Add Student -->
+    <string name="add_student_photo_button">Adicionar foto</string>
+    <string name="add_student_photo_hint">Opcional - Pode ser adicionada depois</string>
+    <string name="add_student_full_name_label">Nome Completo</string>
+    <string name="add_student_full_name_placeholder">Digite o nome completo do aluno</string>
+    <string name="add_student_age_label">Idade</string>
+    <string name="add_student_age_placeholder">Ex: 7</string>
+    <string name="add_student_gender_label">Gênero</string>
+    <string name="add_student_gender_placeholder">Selecione</string>
+    <string name="add_student_phone_label">Contato do Responsável</string>
+    <string name="add_student_phone_placeholder">(00) 00000-0000</string>
+    <string name="add_student_address_section">Endereço</string>
+    <string name="add_student_cep_label">CEP</string>
+    <string name="add_student_cep_placeholder">00000-000</string>
+    <string name="add_student_street_label">Rua</string>
+    <string name="add_student_street_placeholder">Nome da rua</string>
+    <string name="add_student_number_label">Número</string>
+    <string name="add_student_number_placeholder">Número</string>
+    <string name="add_student_complement_label">Complemento</string>
+    <string name="add_student_complement_placeholder">Apto, Bloco, etc</string>
+    <string name="add_student_additional_info_title">Informações Adicionais (Opcional)</string>
+    <string name="add_student_additional_info_hint">Documentos e anamnese podem ser preenchidos agora ou depois</string>
+    <string name="add_student_cancel">Cancelar</string>
+    <string name="add_student_save">Salvar e Finalizar Cadastro</string>
+
+    <!-- Student Profile -->
+    <string name="student_profile_generate_report">Gerar Relatório</string>
+    <string name="student_profile_edit_desc">Editar perfil</string>
+    <string name="student_profile_avatar_desc">Foto do aluno</string>
+    <string name="student_profile_birth_date_label">Data de Nascimento</string>
+    <string name="student_profile_address_label">Endereço</string>
+    <string name="student_profile_objective_label">Objetivo do Acompanhamento</string>
+    <string name="student_profile_tab_progress">Progresso</string>
+    <string name="student_profile_tab_sessions">Sessões</string>
+    <string name="student_profile_tab_documents">Documentos</string>
+    <string name="student_profile_tab_anamnese">Anamnese</string>
+    <string name="student_profile_progress_category_title">Progresso por Categoria</string>
+
     <!-- Dashboard -->
     <string name="dashboard_title">Tela Inicial</string>
     <string name="dashboard_greeting">Olá, %1$s! 👋</string>
-    <string name="dashboard_welcome_sub">Seja bem-vinda!</string>
+    <string name="dashboard_sessions_subtitle">Você tem %1$d sessões agendadas para hoje</string>
     <string name="dashboard_start_session">Iniciar Sessão</string>
+    <string name="dashboard_today_sessions">Sessões de hoje</string>
     <string name="dashboard_recent_sessions">Últimas Sessões Realizadas</string>
+    <string name="dashboard_see_all">Ver todas →</string>
     <string name="dashboard_recent_activities">Atividades Recentes</string>
+    <string name="dashboard_hit_rate_label">Taxa de Acerto</string>
+    <string name="dashboard_session_detail_desc">Ver detalhes</string>
     <string name="dashboard_menu_desc">Abrir menu</string>
     <string name="dashboard_profile_desc">Perfil do usuário</string>
     <string name="dashboard_tab_home">Tela Inicial</string>
