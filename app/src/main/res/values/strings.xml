@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Labirinto do Saber</string>
+    <string name="home_title">Labirinto do Saber</string>
+    <string name="home_refresh_button">Atualizar</string>
+    <string name="loading_description">Carregando</string>
+</resources>
