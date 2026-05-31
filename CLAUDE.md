@@ -262,6 +262,169 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 ---
 
+## 6. Padrões de Navegação
+
+### Callbacks de navegação são responsabilidade do chamador
+
+Ações que causam navegação **não entram no ViewModel**. O `AppNavGraph` injeta lambdas diretamente no composable raiz da tela.
+
+```kotlin
+// AppNavGraph — quem decide para onde vai
+composable(AppDestination.Login.route) {
+    LoginScreen(
+        onLoginSuccess = { navController.navigate(...) },
+        onRegisterClick = { navController.navigate(...) },
+    )
+}
+
+// LoginScreen — apenas declara o contrato
+@Composable
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    onRegisterClick: () -> Unit,
+    ...
+)
+```
+
+Regra prática: se o resultado da ação é "mudar de tela", é callback. Se é "alterar estado ou chamar API", é `Action` no ViewModel.
+
+### Navegação pós-login com limpeza de pilha
+
+Ao navegar para uma tela autenticada, remover as telas de auth da backstack:
+
+```kotlin
+navController.navigate(AppDestination.Dashboard.route) {
+    popUpTo(AppDestination.Login.route) { inclusive = true }
+}
+```
+
+### Voltar com popBackStack
+
+Telas que têm botão "Voltar" usam `navController.popBackStack()` — não `navigate` para a tela anterior.
+
+---
+
+## 7. Padrões Visuais Estabelecidos
+
+### Paleta de cores (`ui/theme/Color.kt`)
+
+| Token | Hex | Uso |
+|---|---|---|
+| `GradientTop` | `#A9DFDB` | Topo do fundo das telas de auth |
+| `GradientMid` | `#CBEAE6` | Meio do gradiente |
+| `GradientBottom` | `#F4F9F8` | Base do gradiente / fundo de telas logadas |
+| `TealPrimary` | `#5CC8C0` | Cor principal, botões de ação |
+| `TealLight` | `#A9DFDB` | Ponta clara de gradientes de botão |
+| `TealDark` | `#3FADA5` | Ponta escura de gradientes de botão |
+| `WarmButtonStart` | `#EDD898` | Botões de etapas intermediárias (ex: recuperar senha) |
+| `WarmButtonEnd` | `#F5E6C8` | Ponta clara do botão warm |
+| `TextPrimary` | `#1A1A1A` | Texto principal |
+| `TextSecondary` | `#9CA3AF` | Texto secundário, placeholders |
+| `InputBackground` | `#F8FAFA` | Fundo dos campos de texto |
+| `InputBorder` | `#E5E7EB` | Borda dos campos de texto |
+
+### Fundo das telas de autenticação
+
+Gradiente vertical com `Brush.verticalGradient`:
+
+```kotlin
+Modifier.background(
+    brush = Brush.verticalGradient(
+        colors = listOf(GradientTop, GradientMid, GradientBottom),
+    )
+)
+```
+
+### Botão de ação principal (gradiente teal)
+
+```kotlin
+Box(
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(52.dp)
+        .clip(RoundedCornerShape(12.dp))
+        .background(Brush.horizontalGradient(colors = listOf(TealDark, TealLight)))
+        .clickable { onClick() },
+    contentAlignment = Alignment.Center,
+) {
+    Text(label, color = Color.White, fontWeight = FontWeight.SemiBold)
+}
+```
+
+### Botão "Voltar" flutuante (pill)
+
+Usado em telas sobre o gradiente (Register, ForgotPassword):
+
+```kotlin
+Surface(
+    onClick = onBackClick,
+    shape = RoundedCornerShape(50.dp),
+    color = Color.White,
+    shadowElevation = 2.dp,
+) {
+    Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
+        Text(stringResource(R.string.back_button))
+    }
+}
+```
+
+### Campos de texto
+
+`OutlinedTextField` com `shape = RoundedCornerShape(12.dp)` e cores:
+
+```kotlin
+OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = TealPrimary,
+    unfocusedBorderColor = InputBorder,
+    focusedContainerColor = InputBackground,
+    unfocusedContainerColor = InputBackground,
+)
+```
+
+### Card branco (conteúdo de telas de auth)
+
+```kotlin
+Card(
+    shape = RoundedCornerShape(24.dp),
+    colors = CardDefaults.cardColors(containerColor = Color.White),
+    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+)
+```
+
+---
+
+## 8. Padrões de Fluxos Multi-Etapa
+
+Fluxos com passos sequenciais (ex: recuperação de senha com 3 etapas) usam **um único ViewModel** com um `enum` de passo:
+
+```kotlin
+enum class ForgotPasswordStep { EMAIL, CODE, NEW_PASSWORD }
+
+data class ForgotPasswordUiState(
+    val step: ForgotPasswordStep = ForgotPasswordStep.EMAIL,
+    ...
+)
+```
+
+O Screen renderiza conteúdo diferente com `when (uiState.step)`. Não criar rotas separadas para cada etapa do mesmo fluxo.
+
+---
+
+## 9. Cores em Data Models
+
+Data classes que representam itens de lista (sessões, atividades) armazenam cores como `Long` (hex ARGB) para não acoplar o modelo ao Compose. A conversão acontece no composable:
+
+```kotlin
+// No modelo
+data class SessionItem(val borderColorHex: Long, ...)
+
+// No composable
+val borderColor = Color(session.borderColorHex)
+```
+
+---
+
 ## Build
 
 - **Gradle version catalog**: todas as dependências em `gradle/libs.versions.toml`
