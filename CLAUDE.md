@@ -5,6 +5,10 @@ Package: `com.labirintodosaber` | minSdk 26 | targetSdk 35
 
 ---
 
+- Build + instalar: `.\gradlew.bat installDebug`
+- Abrir o app: `adb shell am start -n com.labirintodosaber/.MainActivity`
+- Só build (sem instalar): `.\gradlew.bat assembleDebug`
+
 ## Estrutura de Pacotes
 
 ```
@@ -28,6 +32,7 @@ app/src/main/java/com/labirintodosaber/
 ## 1. Convenções de Nomenclatura
 
 ### Composables
+
 - **CamelCase e obrigatoriamente um substantivo.**
 - Adjetivos descritivos são permitidos como prefixo.
 
@@ -48,6 +53,7 @@ fun Clickable(...)        // adjetivo isolado
 ## 2. Padrões de Sintaxe Kotlin
 
 ### Imutabilidade
+
 Preferir `val` a `var`. Usar `var` somente quando a mutação é inevitável e local.
 
 ```kotlin
@@ -60,6 +66,7 @@ var counter = 0  // só aceitável quando realmente mutado no mesmo escopo
 ```
 
 ### Null-Safety
+
 Usar tipos anuláveis, operador de chamada segura e Elvis explicitamente.
 
 ```kotlin
@@ -73,6 +80,7 @@ if (name != null) {
 ```
 
 ### if/when como expressão
+
 Nunca operador ternário ou switch. `if` e `when` retornam valor.
 
 ```kotlin
@@ -86,6 +94,7 @@ val message = when (errorCode) {
 ```
 
 ### Trailing Lambda
+
 Quando o último parâmetro é uma lambda, ela fica fora dos parênteses.
 
 ```kotlin
@@ -104,6 +113,7 @@ items.forEach { item ->
 ## 3. Padrões de UI — Jetpack Compose
 
 ### Parâmetro Modifier
+
 **Toda** função `@Composable` deve aceitar `modifier: Modifier = Modifier` e passá-lo ao primeiro filho.
 
 ```kotlin
@@ -120,6 +130,7 @@ fun PrimaryButton(
 ```
 
 ### Ordem dos Modificadores
+
 A ordem importa: cada `Modifier` altera o retorno do anterior.
 
 ```kotlin
@@ -131,6 +142,7 @@ Modifier.clickable { }.padding(16.dp)
 ```
 
 ### String Resources
+
 Nunca hardcode de strings na UI. Usar `stringResource`.
 
 ```kotlin
@@ -142,6 +154,7 @@ Text(text = "Labirinto do Saber")
 ```
 
 ### Acessibilidade
+
 `contentDescription` é obrigatório em imagens e ícones.  
 Passar `null` apenas se o elemento for puramente decorativo (a ferramenta de acessibilidade ignora).
 
@@ -166,13 +179,14 @@ Icon(
 
 Cada tela tem três artefatos dentro do pacote `ui/screen/<tela>/`:
 
-| Arquivo | Responsabilidade |
-|---|---|
-| `<Tela>Screen.kt` | Composable **stateful** (conecta ao ViewModel) + Composable **stateless** (recebe estado/callbacks) |
-| `<Tela>ViewModel.kt` | Lógica de negócio, `StateFlow<UiState>`, função `onAction(action)` |
-| *(dentro do ViewModel)* | `data class <Tela>UiState` e `sealed interface <Tela>Action` |
+| Arquivo                 | Responsabilidade                                                                                    |
+| ----------------------- | --------------------------------------------------------------------------------------------------- |
+| `<Tela>Screen.kt`       | Composable **stateful** (conecta ao ViewModel) + Composable **stateless** (recebe estado/callbacks) |
+| `<Tela>ViewModel.kt`    | Lógica de negócio, `StateFlow<UiState>`, função `onAction(action)`                                  |
+| _(dentro do ViewModel)_ | `data class <Tela>UiState` e `sealed interface <Tela>Action`                                        |
 
 ### State Hoisting
+
 Mover estado para o chamador. O composable stateless é testável de forma isolada.
 
 ```kotlin
@@ -193,16 +207,17 @@ private fun HomeContent(
 ```
 
 ### Single Source of Truth
+
 Estado deve ser elevado ao ancestral comum mais próximo que precise lê-lo ou alterá-lo.  
 Nunca duplicar estado entre composables — um lê, o outro recebe por parâmetro.
 
 ### Persistência de Estado
 
-| Situação | Ferramenta |
-|---|---|
-| Sobreviver a recomposições | `remember { }` |
-| Sobreviver a rotação de tela / morte do processo | `rememberSaveable { }` |
-| Estado complexo / objetos grandes | `ViewModel` (nunca no `rememberSaveable`) |
+| Situação                                         | Ferramenta                                |
+| ------------------------------------------------ | ----------------------------------------- |
+| Sobreviver a recomposições                       | `remember { }`                            |
+| Sobreviver a rotação de tela / morte do processo | `rememberSaveable { }`                    |
+| Estado complexo / objetos grandes                | `ViewModel` (nunca no `rememberSaveable`) |
 
 ```kotlin
 // Simples — sobrevive à recomposição
@@ -220,12 +235,13 @@ val query = rememberSaveable { mutableStateOf("") }
 
 ### Gerenciamento de Recursos
 
-| Recurso | Iniciar | Liberar | Motivo |
-|---|---|---|---|
-| Câmera, GPS (interativos) | `onResume()` | `onPause()` | Libera em multi-janela quando a janela perde foco |
-| Animações, observers de UI | `onStart()` | `onStop()` | Libera quando a Activity fica invisível |
+| Recurso                    | Iniciar      | Liberar     | Motivo                                            |
+| -------------------------- | ------------ | ----------- | ------------------------------------------------- |
+| Câmera, GPS (interativos)  | `onResume()` | `onPause()` | Libera em multi-janela quando a janela perde foco |
+| Animações, observers de UI | `onStart()`  | `onStop()`  | Libera quando a Activity fica invisível           |
 
 ### Lógica nas Activities
+
 Nunca colocar lógica de negócio diretamente em callbacks da Activity.  
 Usar `ViewModel` para estado e lógica, componentes lifecycle-aware para observações.
 
@@ -251,4 +267,4 @@ override fun onCreate(savedInstanceState: Bundle?) {
 - **Gradle version catalog**: todas as dependências em `gradle/libs.versions.toml`
 - **KSP** (não KAPT) para processamento de anotações (Hilt)
 - **Java 17** para compilação
-- Abrir no Android Studio → deixar o IDE sincronizar o Gradle wrapper automaticamente
+- Gradle Wrapper (`gradlew.bat`) já commitado — não precisa do Android Studio para buildar
