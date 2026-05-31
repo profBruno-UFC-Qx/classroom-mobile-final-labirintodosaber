@@ -81,6 +81,7 @@ fun LoginScreen(
     LoginContent(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onLoginSuccess = onLoginSuccess,
         onRegisterClick = onRegisterClick,
         onForgotPasswordClick = onForgotPasswordClick,
         modifier = modifier,
@@ -91,6 +92,7 @@ fun LoginScreen(
 private fun LoginContent(
     uiState: LoginUiState,
     onAction: (LoginAction) -> Unit,
+    onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -130,7 +132,7 @@ private fun LoginContent(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             ) {
-                LoginForm(uiState = uiState, onAction = onAction, onRegisterClick = onRegisterClick, onForgotPasswordClick = onForgotPasswordClick)
+                LoginForm(uiState = uiState, onAction = onAction, onLoginSuccess = onLoginSuccess, onRegisterClick = onRegisterClick, onForgotPasswordClick = onForgotPasswordClick)
             }
 
             Spacer(modifier = Modifier.height(36.dp))
@@ -142,6 +144,7 @@ private fun LoginContent(
 private fun LoginForm(
     uiState: LoginUiState,
     onAction: (LoginAction) -> Unit,
+    onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
 ) {
@@ -296,7 +299,7 @@ private fun LoginForm(
                         colors = listOf(TealDark, TealLight),
                     ),
                 )
-                .clickable { onAction(LoginAction.OnLoginClick) },
+                .clickable { onLoginSuccess() },
             contentAlignment = Alignment.Center,
         ) {
             Text(
