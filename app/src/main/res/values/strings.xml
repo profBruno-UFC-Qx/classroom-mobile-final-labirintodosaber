@@ -71,4 +71,19 @@
     <string name="forgot_reset_button">Redefinir Senha</string>
     <string name="forgot_password_icon_desc">Ícone de senha</string>
     <string name="forgot_toggle_password_desc">Alternar visibilidade da senha</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Tela Inicial</string>
+    <string name="dashboard_greeting">Olá, %1$s! 👋</string>
+    <string name="dashboard_welcome_sub">Seja bem-vinda!</string>
+    <string name="dashboard_start_session">Iniciar Sessão</string>
+    <string name="dashboard_recent_sessions">Últimas Sessões Realizadas</string>
+    <string name="dashboard_recent_activities">Atividades Recentes</string>
+    <string name="dashboard_menu_desc">Abrir menu</string>
+    <string name="dashboard_profile_desc">Perfil do usuário</string>
+    <string name="dashboard_tab_home">Tela Inicial</string>
+    <string name="dashboard_tab_activities">Atividades</string>
+    <string name="dashboard_tab_students">Alunos</string>
+    <string name="dashboard_tab_reports">Relatórios</string>
+    <string name="dashboard_student_avatar_desc">Avatar do aluno</string>
 </resources>
