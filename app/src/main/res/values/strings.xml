@@ -44,4 +44,31 @@
     <string name="register_google_button">Cadastrar com Google</string>
     <string name="register_login_prompt">Já tem uma conta?</string>
     <string name="register_login_link"> Fazer Login</string>
+
+    <!-- Forgot Password -->
+    <string name="forgot_back_button">Voltar ao login</string>
+    <string name="forgot_title">Recuperar Senha</string>
+    <string name="forgot_subtitle">Digite seu email para receber o código</string>
+    <string name="forgot_step_label">Etapa</string>
+    <string name="forgot_step_email">Email</string>
+    <string name="forgot_step_code">Código</string>
+    <string name="forgot_step_password">Senha</string>
+    <!-- Step 1 -->
+    <string name="forgot_step1_description">Enviaremos um código de verificação de 6 dígitos para seu email.</string>
+    <string name="forgot_email_label">Endereço de Email</string>
+    <string name="forgot_email_icon_desc">Ícone de email</string>
+    <string name="forgot_send_button">Enviar Código</string>
+    <!-- Step 2 -->
+    <string name="forgot_step2_sent_to">Enviamos um código para</string>
+    <string name="forgot_verify_button">Verificar Código</string>
+    <string name="forgot_resend_prompt">Não recebeu o código?</string>
+    <string name="forgot_resend_link"> Reenviar</string>
+    <!-- Step 3 -->
+    <string name="forgot_step3_description">Código verificado! Agora crie uma nova senha segura</string>
+    <string name="forgot_new_password_label">Nova Senha</string>
+    <string name="forgot_new_password_hint">* Mínimo de 6 caracteres</string>
+    <string name="forgot_confirm_new_password_label">Confirmar Nova Senha</string>
+    <string name="forgot_reset_button">Redefinir Senha</string>
+    <string name="forgot_password_icon_desc">Ícone de senha</string>
+    <string name="forgot_toggle_password_desc">Alternar visibilidade da senha</string>
 </resources>

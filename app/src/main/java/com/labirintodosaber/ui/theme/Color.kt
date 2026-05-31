@@ -16,3 +16,6 @@ val TextSecondary = Color(0xFF9CA3AF)
 val InputBackground = Color(0xFFF8FAFA)
 val InputBorder = Color(0xFFE5E7EB)
 val DividerColor = Color(0xFFE5E7EB)
+
+val WarmButtonStart = Color(0xFFEDD898)
+val WarmButtonEnd = Color(0xFFF5E6C8)

@@ -73,6 +73,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -81,6 +82,7 @@ fun LoginScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onRegisterClick = onRegisterClick,
+        onForgotPasswordClick = onForgotPasswordClick,
         modifier = modifier,
     )
 }
@@ -90,6 +92,7 @@ private fun LoginContent(
     uiState: LoginUiState,
     onAction: (LoginAction) -> Unit,
     onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -127,7 +130,7 @@ private fun LoginContent(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             ) {
-                LoginForm(uiState = uiState, onAction = onAction, onRegisterClick = onRegisterClick)
+                LoginForm(uiState = uiState, onAction = onAction, onRegisterClick = onRegisterClick, onForgotPasswordClick = onForgotPasswordClick)
             }
 
             Spacer(modifier = Modifier.height(36.dp))
@@ -140,6 +143,7 @@ private fun LoginForm(
     uiState: LoginUiState,
     onAction: (LoginAction) -> Unit,
     onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 28.dp),
@@ -269,7 +273,7 @@ private fun LoginForm(
             )
             Spacer(modifier = Modifier.weight(1f))
             TextButton(
-                onClick = { onAction(LoginAction.OnForgotPasswordClick) },
+                onClick = onForgotPasswordClick,
                 contentPadding = PaddingValues(0.dp),
             ) {
                 Text(
