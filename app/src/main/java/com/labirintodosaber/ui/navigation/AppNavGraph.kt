@@ -6,8 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.labirintodosaber.ui.screen.dashboard.DashboardScreen
 import com.labirintodosaber.ui.screen.forgotpassword.ForgotPasswordScreen
-import com.labirintodosaber.ui.screen.home.HomeScreen
 import com.labirintodosaber.ui.screen.login.LoginScreen
 import com.labirintodosaber.ui.screen.register.RegisterScreen
 
@@ -24,7 +24,7 @@ fun AppNavGraph(
         composable(AppDestination.Login.route) {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate(AppDestination.Home.route) {
+                    navController.navigate(AppDestination.Dashboard.route) {
                         popUpTo(AppDestination.Login.route) { inclusive = true }
                     }
                 },
@@ -47,10 +47,8 @@ fun AppNavGraph(
                 onBackClick = { navController.popBackStack() },
             )
         }
-        composable(AppDestination.Home.route) {
-            HomeScreen(
-                onNavigate = { destination -> navController.navigate(destination.route) },
-            )
+        composable(AppDestination.Dashboard.route) {
+            DashboardScreen()
         }
     }
 }
@@ -59,5 +57,5 @@ sealed class AppDestination(val route: String) {
     data object Login : AppDestination("login")
     data object Register : AppDestination("register")
     data object ForgotPassword : AppDestination("forgot-password")
-    data object Home : AppDestination("home")
+    data object Dashboard : AppDestination("dashboard")
 }
