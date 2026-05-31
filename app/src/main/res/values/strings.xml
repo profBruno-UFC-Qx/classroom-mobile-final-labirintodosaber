@@ -4,4 +4,22 @@
     <string name="home_title">Labirinto do Saber</string>
     <string name="home_refresh_button">Atualizar</string>
     <string name="loading_description">Carregando</string>
+
+    <!-- Login -->
+    <string name="login_logo_desc">Logo do Labirinto do Saber</string>
+    <string name="login_title">Entrar</string>
+    <string name="login_subtitle">Acesse sua conta para continuar</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_email_placeholder">seu@email.com</string>
+    <string name="login_email_icon_desc">Ícone de email</string>
+    <string name="login_password_label">Senha</string>
+    <string name="login_password_icon_desc">Ícone de senha</string>
+    <string name="login_toggle_password_desc">Alternar visibilidade da senha</string>
+    <string name="login_remember_me">Lembre-se de mim</string>
+    <string name="login_forgot_password">Esqueci minha senha</string>
+    <string name="login_button">Entrar agora</string>
+    <string name="login_or_divider">OU</string>
+    <string name="login_google_button">Continuar com Google</string>
+    <string name="login_register_prompt">Novo por aqui?</string>
+    <string name="login_register_link"> Crie sua conta gratuitamente</string>
 </resources>
