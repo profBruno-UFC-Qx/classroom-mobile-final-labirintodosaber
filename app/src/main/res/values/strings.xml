@@ -22,4 +22,26 @@
     <string name="login_google_button">Continuar com Google</string>
     <string name="login_register_prompt">Novo por aqui?</string>
     <string name="login_register_link"> Crie sua conta gratuitamente</string>
+
+    <!-- Register -->
+    <string name="register_back_button">Voltar ao login</string>
+    <string name="register_title">Criar Conta</string>
+    <string name="register_subtitle">Preencha seus dados para começar</string>
+    <string name="register_full_name_label">Nome Completo</string>
+    <string name="register_full_name_placeholder">Seu nome completo</string>
+    <string name="register_full_name_icon_desc">Ícone de pessoa</string>
+    <string name="register_email_label">Email</string>
+    <string name="register_email_placeholder">seu@email.com</string>
+    <string name="register_email_icon_desc">Ícone de email</string>
+    <string name="register_password_label">Senha</string>
+    <string name="register_password_icon_desc">Ícone de senha</string>
+    <string name="register_confirm_password_label">Confirmar Senha</string>
+    <string name="register_confirm_password_icon_desc">Ícone de confirmação de senha</string>
+    <string name="register_toggle_password_desc">Alternar visibilidade da senha</string>
+    <string name="register_toggle_confirm_password_desc">Alternar visibilidade da confirmação de senha</string>
+    <string name="register_button">Criar minha conta</string>
+    <string name="register_or_divider">OU</string>
+    <string name="register_google_button">Cadastrar com Google</string>
+    <string name="register_login_prompt">Já tem uma conta?</string>
+    <string name="register_login_link"> Fazer Login</string>
 </resources>

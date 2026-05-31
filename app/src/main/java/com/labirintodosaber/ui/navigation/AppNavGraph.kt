@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.labirintodosaber.ui.screen.home.HomeScreen
 import com.labirintodosaber.ui.screen.login.LoginScreen
+import com.labirintodosaber.ui.screen.register.RegisterScreen
 
 @Composable
 fun AppNavGraph(
@@ -26,6 +27,15 @@ fun AppNavGraph(
                         popUpTo(AppDestination.Login.route) { inclusive = true }
                     }
                 },
+                onRegisterClick = {
+                    navController.navigate(AppDestination.Register.route)
+                },
+            )
+        }
+        composable(AppDestination.Register.route) {
+            RegisterScreen(
+                onBackClick = { navController.popBackStack() },
+                onLoginClick = { navController.popBackStack() },
             )
         }
         composable(AppDestination.Home.route) {
@@ -38,5 +48,6 @@ fun AppNavGraph(
 
 sealed class AppDestination(val route: String) {
     data object Login : AppDestination("login")
+    data object Register : AppDestination("register")
     data object Home : AppDestination("home")
 }

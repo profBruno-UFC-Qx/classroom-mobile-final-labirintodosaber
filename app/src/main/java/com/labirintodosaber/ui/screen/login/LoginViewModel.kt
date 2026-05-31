@@ -23,7 +23,6 @@ class LoginViewModel @Inject constructor() : ViewModel() {
             LoginAction.OnLoginClick -> { /* TODO: implementar autenticação */ }
             LoginAction.OnGoogleLoginClick -> { /* TODO: implementar Google Sign-In */ }
             LoginAction.OnForgotPasswordClick -> { /* TODO: navegar para recuperação de senha */ }
-            LoginAction.OnRegisterClick -> { /* TODO: navegar para cadastro */ }
         }
     }
 }
@@ -45,5 +44,4 @@ sealed interface LoginAction {
     data object OnLoginClick : LoginAction
     data object OnGoogleLoginClick : LoginAction
     data object OnForgotPasswordClick : LoginAction
-    data object OnRegisterClick : LoginAction
 }
