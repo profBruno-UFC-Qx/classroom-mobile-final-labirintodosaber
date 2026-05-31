@@ -53,14 +53,18 @@ Liste aqui as tecnologias e bibliotecas que foram utilizadas no projeto.
 
 ## Instruções para Execução
 
-[Inclua instruções claras sobre como rodar o projeto localmente. Isso é crucial para que você possa testá-lo nas próximas entregas. **Somente caso haja alguma coisa diferente do usual**
+**Pré-requisitos:** Android SDK instalado (via Android Studio) com `adb` no PATH.
 
-```bash
+```powershell
 # Clone o repositório
-git clone [https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories](https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories)
+git clone <url-do-repo>
+cd <nome-do-repositorio>
 
-# Navegue para o diretório
-cd [nome-do-repositorio]
+# Build + instalar no emulador/dispositivo conectado
+.\gradlew.bat installDebug
 
-# Siga as instruções específicas para a sua tecnologia...
+# Abrir o app após instalar
+adb shell am start -n com.labirintodosaber/.MainActivity
 ```
+
+> Na primeira execução o Gradle pode demorar alguns minutos baixando dependências. As seguintes são incrementais e rápidas.
