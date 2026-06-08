@@ -71,6 +71,7 @@ fun StudentsScreen(
     onStudentClick: (Int) -> Unit,
     onAddStudentClick: () -> Unit,
     onHomeClick: () -> Unit,
+    onActivitiesClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: StudentsViewModel = hiltViewModel(),
 ) {
@@ -81,6 +82,7 @@ fun StudentsScreen(
         onStudentClick = onStudentClick,
         onAddStudentClick = onAddStudentClick,
         onHomeClick = onHomeClick,
+        onActivitiesClick = onActivitiesClick,
         modifier = modifier,
     )
 }
@@ -93,6 +95,7 @@ private fun StudentsContent(
     onStudentClick: (Int) -> Unit,
     onAddStudentClick: () -> Unit,
     onHomeClick: () -> Unit,
+    onActivitiesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val filtered = if (uiState.searchQuery.isBlank()) uiState.students
@@ -123,7 +126,7 @@ private fun StudentsContent(
             )
         },
         bottomBar = {
-            StudentsBottomBar(onHomeClick = onHomeClick)
+            StudentsBottomBar(onHomeClick = onHomeClick, onActivitiesClick = onActivitiesClick)
         },
         containerColor = Color.White,
     ) { padding ->
@@ -306,6 +309,7 @@ private fun StudentProgressBar(
 @Composable
 private fun StudentsBottomBar(
     onHomeClick: () -> Unit,
+    onActivitiesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavigationBar(
@@ -328,7 +332,7 @@ private fun StudentsBottomBar(
         )
         NavigationBarItem(
             selected = false,
-            onClick = { /* TODO */ },
+            onClick = onActivitiesClick,
             icon = { Icon(Icons.Outlined.Menu, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_activities), style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(

@@ -136,4 +136,50 @@
     <string name="dashboard_tab_students">Alunos</string>
     <string name="dashboard_tab_reports">Relatórios</string>
     <string name="dashboard_student_avatar_desc">Avatar do aluno</string>
+
+    <!-- Activities -->
+    <string name="activities_title">Atividades</string>
+    <string name="activities_tab_all">Todos</string>
+    <string name="activities_tab_notebooks">Cadernos</string>
+    <string name="activities_tab_groups">Grupos</string>
+    <string name="activities_add_button">Cadastrar Atividade</string>
+    <string name="activities_task_media_icon_desc">Atividade com mídia</string>
+    <string name="activities_groups_count">%1$d grupos · %2$d atividades</string>
+    <string name="activities_tasks_count">%1$d atividades</string>
+
+    <!-- Create Activity -->
+    <string name="create_activity_title">Criar Atividade</string>
+    <string name="create_activity_name_label">Nome da Atividade *</string>
+    <string name="create_activity_image_label">Imagem da Atividade</string>
+    <string name="create_activity_audio_label">Áudio da Atividade</string>
+    <string name="create_activity_category_label">Categoria</string>
+    <string name="create_activity_type_label">Tipo</string>
+    <string name="create_activity_alternatives_label">Alternativas</string>
+    <string name="create_activity_add_alternative">Adicionar Alternativa</string>
+    <string name="create_activity_button">Criar Atividade</string>
+    <string name="create_activity_alternative_placeholder">Texto da alternativa</string>
+    <string name="create_activity_correct_desc">Marcar como correta</string>
+    <string name="create_activity_remove_alternative_desc">Remover alternativa</string>
+
+    <!-- Create Notebook -->
+    <string name="create_notebook_title">Criar Caderno</string>
+    <string name="create_notebook_name_label">Nome do Caderno *</string>
+    <string name="create_notebook_description_label">Descrição</string>
+    <string name="create_notebook_button">Criar Caderno</string>
+
+    <!-- Create Task Group -->
+    <string name="create_task_group_title">Criar Grupo de Atividades</string>
+    <string name="create_task_group_name_label">Nome do Grupo *</string>
+    <string name="create_task_group_tasks_section">Atividades disponíveis</string>
+    <string name="create_task_group_selected_count">%1$d atividades selecionadas</string>
+    <string name="create_task_group_button">Criar Grupo</string>
+
+    <!-- Category chips -->
+    <string name="category_reading">Leitura</string>
+    <string name="category_writing">Escrita</string>
+    <string name="category_vocabulary">Vocabulário</string>
+    <string name="category_comprehension">Compreensão</string>
+
+    <!-- Back button (shared) -->
+    <string name="back_button">Voltar</string>
 </resources>

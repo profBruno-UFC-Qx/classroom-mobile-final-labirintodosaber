@@ -79,6 +79,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 @Composable
 fun DashboardScreen(
     onStudentsClick: () -> Unit = {},
+    onActivitiesClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
@@ -87,6 +88,7 @@ fun DashboardScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onStudentsClick = onStudentsClick,
+        onActivitiesClick = onActivitiesClick,
         modifier = modifier,
     )
 }
@@ -97,6 +99,7 @@ private fun DashboardContent(
     uiState: DashboardUiState,
     onAction: (DashboardAction) -> Unit,
     onStudentsClick: () -> Unit,
+    onActivitiesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -139,6 +142,7 @@ private fun DashboardContent(
                 selectedTab = uiState.selectedTab,
                 onTabSelect = { onAction(DashboardAction.OnTabSelect(it)) },
                 onStudentsClick = onStudentsClick,
+                onActivitiesClick = onActivitiesClick,
             )
         },
         containerColor = Color.White,
@@ -622,6 +626,7 @@ private fun DashboardBottomBar(
     selectedTab: DashboardTab,
     onTabSelect: (DashboardTab) -> Unit,
     onStudentsClick: () -> Unit,
+    onActivitiesClick: () -> Unit,
 ) {
     data class TabItem(val tab: DashboardTab, val label: Int, val icon: ImageVector, val iconFilled: ImageVector)
 
@@ -641,8 +646,11 @@ private fun DashboardBottomBar(
             NavigationBarItem(
                 selected = selected,
                 onClick = {
-                    if (item.tab == DashboardTab.STUDENTS) onStudentsClick()
-                    else onTabSelect(item.tab)
+                    when (item.tab) {
+                        DashboardTab.STUDENTS -> onStudentsClick()
+                        DashboardTab.ACTIVITIES -> onActivitiesClick()
+                        else -> onTabSelect(item.tab)
+                    }
                 },
                 icon = {
                     Icon(
