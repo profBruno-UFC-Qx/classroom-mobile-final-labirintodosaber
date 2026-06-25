@@ -1,5 +1,11 @@
 package com.labirintodosaber.ui.screen.createactivity
 
+import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,6 +36,7 @@ import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,6 +66,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
+import com.labirintodosaber.data.remote.FileUpload
+import com.labirintodosaber.ui.components.CategorySelector
 import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
@@ -94,6 +104,14 @@ private fun CreateActivityContent(
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        uri?.let { onAction(CreateActivityAction.OnImagePicked(context.toFileUpload(it, "imagem"))) }
+    }
+    val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { onAction(CreateActivityAction.OnAudioPicked(context.toFileUpload(it, "audio"))) }
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -143,6 +161,21 @@ private fun CreateActivityContent(
                 )
             }
 
+            // Categoria
+            item {
+                Text(
+                    text = stringResource(R.string.create_activity_category_label),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                CategorySelector(
+                    selected = uiState.category,
+                    onSelect = { onAction(CreateActivityAction.OnCategorySelect(it)) },
+                )
+            }
+
             // Imagem
             item {
                 MediaUploadField(
@@ -150,6 +183,10 @@ private fun CreateActivityContent(
                         Icon(Icons.Outlined.Image, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(20.dp))
                     },
                     label = stringResource(R.string.create_activity_image_label),
+                    fileName = uiState.imageFile?.fileName,
+                    onClick = {
+                        imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    },
                 )
             }
 
@@ -160,6 +197,8 @@ private fun CreateActivityContent(
                         Icon(Icons.Outlined.AudioFile, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(20.dp))
                     },
                     label = stringResource(R.string.create_activity_audio_label),
+                    fileName = uiState.audioFile?.fileName,
+                    onClick = { audioPicker.launch("audio/*") },
                 )
             }
 
@@ -211,6 +250,17 @@ private fun CreateActivityContent(
                 }
             }
 
+            // Erro
+            uiState.errorMessage?.let { error ->
+                item {
+                    Text(
+                        text = error,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFFC62828),
+                    )
+                }
+            }
+
             // Botões
             item {
                 Row(
@@ -231,13 +281,17 @@ private fun CreateActivityContent(
                             .height(52.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(Brush.horizontalGradient(listOf(TealDark, TealLight)))
-                            .clickable(enabled = uiState.name.isNotBlank()) { onAction(CreateActivityAction.OnSave) },
+                            .clickable(enabled = !uiState.isSaving) { onAction(CreateActivityAction.OnSave) },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Book, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Criar Atividade", color = Color.White, fontWeight = FontWeight.SemiBold)
+                        if (uiState.isSaving) {
+                            CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Outlined.Book, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Criar Atividade", color = Color.White, fontWeight = FontWeight.SemiBold)
+                            }
                         }
                     }
                 }
@@ -251,25 +305,53 @@ private fun CreateActivityContent(
 private fun MediaUploadField(
     icon: @Composable () -> Unit,
     label: String,
+    fileName: String?,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val hasFile = fileName != null
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, InputBorder, RoundedCornerShape(12.dp))
+            .border(1.dp, if (hasFile) TealPrimary else InputBorder, RoundedCornerShape(12.dp))
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             icon()
             Spacer(modifier = Modifier.width(10.dp))
-            Text(label, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+            Text(
+                text = fileName ?: label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (hasFile) TextPrimary else TextSecondary,
+                maxLines = 1,
+            )
         }
-        Icon(Icons.Outlined.Upload, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(20.dp))
+        Icon(
+            imageVector = if (hasFile) Icons.Outlined.CheckCircle else Icons.Outlined.Upload,
+            contentDescription = null,
+            tint = if (hasFile) TealPrimary else TextSecondary,
+            modifier = Modifier.size(20.dp),
+        )
     }
 }
+
+/** Lê um `Uri` selecionado (Photo Picker / SAF) e o converte em [FileUpload] com bytes resolvidos. */
+private fun Context.toFileUpload(uri: Uri, fallbackName: String): FileUpload? = runCatching {
+    val mime = contentResolver.getType(uri) ?: "application/octet-stream"
+    val displayName = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) cursor.getString(0) else null
+    }
+    val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return null
+    FileUpload(
+        fileName = displayName ?: fallbackName,
+        bytes = bytes,
+        mimeType = mime,
+    )
+}.getOrNull()
 
 @Composable
 private fun AlternativeRow(

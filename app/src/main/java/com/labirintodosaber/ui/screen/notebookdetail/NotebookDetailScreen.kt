@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,24 +43,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
-import com.labirintodosaber.data.model.TaskCategory
-import com.labirintodosaber.ui.screen.activities.ActivitiesMockData
-import com.labirintodosaber.ui.screen.activities.MockTask
+import com.labirintodosaber.ui.theme.TealPrimary
 import com.labirintodosaber.ui.theme.TextPrimary
 import com.labirintodosaber.ui.theme.TextSecondary
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotebookDetailScreen(
-    notebookId: String,
     onBackClick: () -> Unit,
     onTaskClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: NotebookDetailViewModel = hiltViewModel(),
 ) {
-    val notebook = ActivitiesMockData.notebookById(notebookId)
-    val tasks = ActivitiesMockData.tasksForNotebook(notebookId)
-    val iconColor = Color(notebook?.iconColorHex ?: 0xFF5CC8C0)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    NotebookDetailContent(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onTaskClick = onTaskClick,
+        onRetry = viewModel::onRetry,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NotebookDetailContent(
+    uiState: NotebookDetailUiState,
+    onBackClick: () -> Unit,
+    onTaskClick: (String) -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val iconColor = Color(uiState.iconColorHex)
 
     Scaffold(
         modifier = modifier,
@@ -66,10 +84,11 @@ fun NotebookDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = notebook?.title ?: "Caderno",
+                        text = uiState.title.ifBlank { "Caderno" },
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary,
+                        maxLines = 1,
                     )
                 },
                 navigationIcon = {
@@ -82,21 +101,49 @@ fun NotebookDetailScreen(
         },
         containerColor = Color(0xFFF5F5F5),
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            if (notebook != null) {
-                item {
-                    Text(notebook.subtitle, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text("${tasks.size} atividades", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
-                    Spacer(modifier = Modifier.height(8.dp))
+        when {
+            uiState.isLoading -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = TealPrimary)
+            }
+
+            uiState.errorMessage != null -> Column(
+                modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                Spacer(modifier = Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(TealPrimary)
+                        .clickable { onRetry() }
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                ) {
+                    Text(stringResource(R.string.students_retry), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
                 }
             }
-            items(tasks) { task ->
-                TaskCard(task = task, iconColor = iconColor, onClick = { onTaskClick(task.id) })
+
+            else -> LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                item {
+                    Text("${uiState.categoryLabel} · ${uiState.tasks.size} atividades · ${uiState.groupCount} grupos", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                if (uiState.tasks.isEmpty()) {
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth().padding(top = 32.dp), contentAlignment = Alignment.Center) {
+                            Text(stringResource(R.string.notebook_detail_empty), color = TextSecondary)
+                        }
+                    }
+                } else {
+                    items(uiState.tasks) { task ->
+                        TaskCard(task = task, iconColor = iconColor, onClick = { onTaskClick(task.id) })
+                    }
+                }
             }
         }
     }
@@ -105,7 +152,7 @@ fun NotebookDetailScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TaskCard(
-    task: MockTask,
+    task: NotebookTaskRow,
     iconColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -128,12 +175,8 @@ private fun TaskCard(
                 Text(task.prompt, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = TextPrimary, maxLines = 2)
                 Spacer(modifier = Modifier.height(6.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    CategoryPill(task.category.displayName())
-                    Box(
-                        modifier = Modifier.clip(RoundedCornerShape(50.dp)).background(Color(0xFFF0F0F0)).padding(horizontal = 10.dp, vertical = 3.dp),
-                    ) {
-                        Text("${task.alternatives.size} alternativas", style = MaterialTheme.typography.labelSmall, color = TextSecondary, fontSize = 10.sp)
-                    }
+                    CategoryPill(task.categoryLabel)
+                    CategoryPill("${task.alternativeCount} alternativas")
                 }
             }
         }
@@ -147,11 +190,4 @@ private fun CategoryPill(label: String) {
     ) {
         Text(label, style = MaterialTheme.typography.labelSmall, color = TextSecondary, fontSize = 10.sp)
     }
-}
-
-private fun TaskCategory.displayName() = when (this) {
-    TaskCategory.READING -> "Leitura"
-    TaskCategory.WRITING -> "Escrita"
-    TaskCategory.VOCABULARY -> "Vocabulário"
-    TaskCategory.COMPREHENSION -> "Compreensão"
 }

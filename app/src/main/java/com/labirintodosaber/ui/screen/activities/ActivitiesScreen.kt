@@ -37,6 +37,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,6 +67,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.theme.InputBorder
@@ -88,6 +90,13 @@ fun ActivitiesScreen(
     viewModel: ActivitiesViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Recarrega ao entrar e ao retomar a tela (ex.: voltar de criar tarefa/grupo/caderno).
+    LifecycleResumeEffect(Unit) {
+        viewModel.refresh()
+        onPauseOrDispose { }
+    }
+
     ActivitiesContent(
         uiState = uiState,
         onAction = viewModel::onAction,
@@ -252,17 +261,63 @@ private fun ActivitiesContent(
 
             item { Spacer(modifier = Modifier.height(8.dp)) }
 
-            items(currentItems) { item ->
-                val onClick: () -> Unit = when (item.iconType) {
-                    ActivityIconType.BOOK -> { { onNotebookClick(item.id) } }
-                    ActivityIconType.FOLDER -> { { onGroupClick(item.id) } }
-                    ActivityIconType.DOCUMENT -> { { onTaskClick(item.id) } }
+            when {
+                uiState.isLoading -> item {
+                    Box(modifier = Modifier.fillMaxWidth().padding(top = 48.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = TealPrimary)
+                    }
                 }
-                ActivityCard(
-                    item = item,
-                    onClick = onClick,
-                    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp),
-                )
+
+                uiState.errorMessage != null -> item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp, vertical = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Text(
+                            text = uiState.errorMessage,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextSecondary,
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50.dp))
+                                .background(TealPrimary)
+                                .clickable { onAction(ActivitiesAction.OnRetry) }
+                                .padding(horizontal = 20.dp, vertical = 10.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.students_retry),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White,
+                            )
+                        }
+                    }
+                }
+
+                currentItems.isEmpty() -> item {
+                    Box(modifier = Modifier.fillMaxWidth().padding(top = 48.dp), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = stringResource(R.string.activities_empty),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextSecondary,
+                        )
+                    }
+                }
+
+                else -> items(currentItems) { item ->
+                    val onClick: () -> Unit = when (item.iconType) {
+                        ActivityIconType.BOOK -> { { onNotebookClick(item.id) } }
+                        ActivityIconType.FOLDER -> { { onGroupClick(item.id) } }
+                        ActivityIconType.DOCUMENT -> { { onTaskClick(item.id) } }
+                    }
+                    ActivityCard(
+                        item = item,
+                        onClick = onClick,
+                        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp),
+                    )
+                }
             }
         }
     }

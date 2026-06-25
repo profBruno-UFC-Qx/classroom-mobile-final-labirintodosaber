@@ -6,8 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,15 +16,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,10 +52,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
-import com.labirintodosaber.data.model.TaskCategory
+import com.labirintodosaber.ui.components.CategorySelector
 import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
@@ -140,43 +142,61 @@ private fun CreateTaskGroupContent(
             }
 
             item {
-                OutlinedTextField(
-                    value = uiState.description,
-                    onValueChange = { onAction(CreateTaskGroupAction.OnDescriptionChange(it)) },
-                    label = { Text(stringResource(R.string.create_notebook_description_label)) },
-                    placeholder = { Text("Descreva o objetivo deste caderno...", color = TextSecondary) },
-                    minLines = 3,
-                    maxLines = 5,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = fieldColors(),
+                Text("Categoria *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Spacer(modifier = Modifier.height(10.dp))
+                CategorySelector(
+                    selected = uiState.category,
+                    onSelect = { onAction(CreateTaskGroupAction.OnCategorySelect(it)) },
                 )
             }
 
+            // Atividades (obrigatório, mín. 1)
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text("Categorias *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50.dp))
-                            .background(TealPrimary)
-                            .clickable {}
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
-                    ) {
-                        Text("+ Criar Categoria", style = MaterialTheme.typography.labelSmall, color = Color.White, fontWeight = FontWeight.SemiBold)
+                Text("Atividades *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Selecione as atividades que compõem este grupo", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+            }
+
+            when {
+                uiState.isLoadingTasks -> item {
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = TealPrimary)
                     }
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Selecione as categorias que este caderno abrange", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
-                Spacer(modifier = Modifier.height(10.dp))
-                CategoryChips(
-                    selected = uiState.selectedCategories,
-                    onToggle = { onAction(CreateTaskGroupAction.OnCategoryToggle(it)) },
-                )
+                uiState.tasksError != null -> item {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(uiState.tasksError, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50.dp))
+                                .background(TealPrimary)
+                                .clickable { onAction(CreateTaskGroupAction.OnRetryTasks) }
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        ) {
+                            Text(stringResource(R.string.students_retry), style = MaterialTheme.typography.labelSmall, color = Color.White, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
+                uiState.availableTasks.isEmpty() -> item {
+                    Text("Nenhuma atividade cadastrada ainda.", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                }
+                else -> item {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        uiState.availableTasks.forEach { task ->
+                            TaskSelectRow(
+                                task = task,
+                                selected = task.id in uiState.selectedTaskIds,
+                                onToggle = { onAction(CreateTaskGroupAction.OnTaskToggle(task.id)) },
+                            )
+                        }
+                    }
+                }
+            }
+
+            uiState.errorMessage?.let { error ->
+                item {
+                    Text(error, style = MaterialTheme.typography.bodySmall, color = Color(0xFFC62828))
+                }
             }
 
             item {
@@ -198,13 +218,17 @@ private fun CreateTaskGroupContent(
                             .height(52.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(Brush.horizontalGradient(listOf(TealDark, TealLight)))
-                            .clickable(enabled = uiState.name.isNotBlank()) { onAction(CreateTaskGroupAction.OnSave) },
+                            .clickable(enabled = !uiState.isSaving) { onAction(CreateTaskGroupAction.OnSave) },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Folder, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Criar Caderno", color = Color.White, fontWeight = FontWeight.SemiBold)
+                        if (uiState.isSaving) {
+                            CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Outlined.Folder, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(stringResource(R.string.create_task_group_button), color = Color.White, fontWeight = FontWeight.SemiBold)
+                            }
                         }
                     }
                 }
@@ -214,41 +238,37 @@ private fun CreateTaskGroupContent(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun CategoryChips(
-    selected: Set<TaskCategory>,
-    onToggle: (TaskCategory) -> Unit,
+private fun TaskSelectRow(
+    task: TaskOption,
+    selected: Boolean,
+    onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val categories = listOf(
-        TaskCategory.READING to "Leitura",
-        TaskCategory.WRITING to "Escrita",
-        TaskCategory.VOCABULARY to "Vocabulário",
-        TaskCategory.COMPREHENSION to "Compreensão",
-    )
-    FlowRow(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        categories.forEach { (cat, label) ->
-            val isSelected = cat in selected
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (isSelected) TealPrimary else Color.White)
-                    .border(1.dp, if (isSelected) TealPrimary else InputBorder, RoundedCornerShape(8.dp))
-                    .clickable { onToggle(cat) }
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-            ) {
-                Text(label, style = MaterialTheme.typography.bodySmall, color = if (isSelected) Color.White else TextPrimary)
-            }
-        }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.5.dp, if (selected) TealPrimary else InputBorder, RoundedCornerShape(12.dp))
+            .clickable { onToggle() }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.White)
-                .border(1.dp, InputBorder, RoundedCornerShape(8.dp))
-                .padding(horizontal = 14.dp, vertical = 8.dp),
+                .size(24.dp)
+                .clip(CircleShape)
+                .background(if (selected) TealPrimary else Color(0xFFF0F0F0)),
+            contentAlignment = Alignment.Center,
         ) {
-            Text("Matemática", style = MaterialTheme.typography.bodySmall, color = TextPrimary)
+            if (selected) {
+                Icon(Icons.Outlined.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+            }
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(task.prompt, style = MaterialTheme.typography.bodyMedium, color = TextPrimary, maxLines = 2)
+            Text(task.categoryLabel, style = MaterialTheme.typography.labelSmall, color = TextSecondary, fontSize = 10.sp)
         }
     }
 }

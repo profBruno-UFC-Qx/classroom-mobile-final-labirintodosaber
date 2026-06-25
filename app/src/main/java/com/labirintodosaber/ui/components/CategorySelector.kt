@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.labirintodosaber.R
 import com.labirintodosaber.data.model.TaskCategory
 import com.labirintodosaber.ui.theme.InputBorder
+import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealPrimary
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -53,9 +54,9 @@ private fun CategoryChip(
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(50.dp)
-    val background = if (isSelected) TealPrimary else Color.Transparent
+    val background = if (isSelected) TealDark else Color.Transparent
     val textColor = if (isSelected) Color.White else TealPrimary
-    val borderColor = if (isSelected) TealPrimary else InputBorder
+    val borderColor = if (isSelected) TealDark else InputBorder
 
     Box(
         modifier = modifier

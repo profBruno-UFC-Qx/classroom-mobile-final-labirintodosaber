@@ -1,15 +1,30 @@
 package com.labirintodosaber.ui.screen.activities
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.labirintodosaber.data.model.NotebookWithGroups
+import com.labirintodosaber.data.model.Task
+import com.labirintodosaber.data.model.TaskCategory
+import com.labirintodosaber.data.model.TaskGroup
+import com.labirintodosaber.data.remote.ApiResult
+import com.labirintodosaber.data.repository.TaskGroupRepository
+import com.labirintodosaber.data.repository.TaskNotebookRepository
+import com.labirintodosaber.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ActivitiesViewModel @Inject constructor() : ViewModel() {
+class ActivitiesViewModel @Inject constructor(
+    private val taskRepository: TaskRepository,
+    private val taskGroupRepository: TaskGroupRepository,
+    private val taskNotebookRepository: TaskNotebookRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ActivitiesUiState())
     val uiState: StateFlow<ActivitiesUiState> = _uiState.asStateFlow()
@@ -18,8 +33,97 @@ class ActivitiesViewModel @Inject constructor() : ViewModel() {
         when (action) {
             is ActivitiesAction.OnTabSelected -> _uiState.update { it.copy(selectedTab = action.tab) }
             is ActivitiesAction.OnSearchChange -> _uiState.update { it.copy(searchQuery = action.query) }
+            ActivitiesAction.OnRetry -> load()
         }
     }
+
+    /** Recarrega ao entrar e sempre que a tela é retomada (volta de criação de tarefa/grupo/caderno). */
+    fun refresh() = load()
+
+    private fun load() {
+        viewModelScope.launch {
+            val isFirstLoad = _uiState.value.allItems.isEmpty()
+            if (isFirstLoad) _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val tasksDeferred = async { taskRepository.list() }
+            val groupsDeferred = async { taskGroupRepository.listByEducator() }
+            val notebooksDeferred = async { taskNotebookRepository.list() }
+
+            val tasksResult = tasksDeferred.await()
+            val groupsResult = groupsDeferred.await()
+            val notebooksResult = notebooksDeferred.await()
+
+            val firstError = listOf(tasksResult, groupsResult, notebooksResult)
+                .filterIsInstance<ApiResult.Error>()
+                .firstOrNull()
+            if (firstError != null) {
+                // Em refresh silencioso (já há dados), mantém o conteúdo atual em vez de mostrar erro.
+                _uiState.update {
+                    if (isFirstLoad) it.copy(isLoading = false, errorMessage = firstError.message)
+                    else it.copy(isLoading = false)
+                }
+                return@launch
+            }
+
+            val tasks = (tasksResult as ApiResult.Success).data.map { it.toCardItem() }
+            val groups = (groupsResult as ApiResult.Success).data.map { it.toCardItem() }
+            val notebooks = (notebooksResult as ApiResult.Success).data.map { it.toCardItem() }
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = null,
+                    tasks = tasks,
+                    groups = groups,
+                    notebooks = notebooks,
+                    allItems = notebooks + groups + tasks,
+                )
+            }
+        }
+    }
+}
+
+// ── Mapeamento domínio → UI ─────────────────────────────────────────────────────
+
+private fun Task.toCardItem() = ActivityCardItem(
+    id = id,
+    title = prompt,
+    subtitle = "${alternatives.size} alternativas",
+    categories = listOf(category.displayName()),
+    iconType = ActivityIconType.DOCUMENT,
+    iconColorHex = category.colorHex(),
+)
+
+private fun TaskGroup.toCardItem() = ActivityCardItem(
+    id = id,
+    title = name,
+    subtitle = "${tasksIds.size} atividades",
+    categories = listOf(category.displayName()),
+    iconType = ActivityIconType.FOLDER,
+    iconColorHex = category.colorHex(),
+)
+
+private fun NotebookWithGroups.toCardItem() = ActivityCardItem(
+    id = notebook.id,
+    title = notebook.description,
+    subtitle = "${notebook.tasks.size} atividades · ${taskGroups.size} grupos",
+    categories = listOf(notebook.category.displayName()),
+    iconType = ActivityIconType.BOOK,
+    iconColorHex = notebook.category.colorHex(),
+)
+
+internal fun TaskCategory.displayName() = when (this) {
+    TaskCategory.READING -> "Leitura"
+    TaskCategory.WRITING -> "Escrita"
+    TaskCategory.VOCABULARY -> "Vocabulário"
+    TaskCategory.COMPREHENSION -> "Compreensão"
+}
+
+internal fun TaskCategory.colorHex(): Long = when (this) {
+    TaskCategory.READING -> 0xFF5CC8C0
+    TaskCategory.WRITING -> 0xFF50C878
+    TaskCategory.VOCABULARY -> 0xFFE94B8F
+    TaskCategory.COMPREHENSION -> 0xFFE5A820
 }
 
 enum class ActivitiesTab { ALL, NOTEBOOKS, GROUPS, TASKS }
@@ -27,10 +131,12 @@ enum class ActivitiesTab { ALL, NOTEBOOKS, GROUPS, TASKS }
 data class ActivitiesUiState(
     val selectedTab: ActivitiesTab = ActivitiesTab.ALL,
     val searchQuery: String = "",
-    val allItems: List<ActivityCardItem> = buildAll(),
-    val notebooks: List<ActivityCardItem> = buildNotebooks(),
-    val groups: List<ActivityCardItem> = buildGroups(),
-    val tasks: List<ActivityCardItem> = buildTasks(),
+    val allItems: List<ActivityCardItem> = emptyList(),
+    val notebooks: List<ActivityCardItem> = emptyList(),
+    val groups: List<ActivityCardItem> = emptyList(),
+    val tasks: List<ActivityCardItem> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 data class ActivityCardItem(
@@ -47,46 +153,5 @@ enum class ActivityIconType { BOOK, FOLDER, DOCUMENT }
 sealed interface ActivitiesAction {
     data class OnTabSelected(val tab: ActivitiesTab) : ActivitiesAction
     data class OnSearchChange(val query: String) : ActivitiesAction
-}
-
-private fun buildNotebooks() = ActivitiesMockData.notebooks.map { n ->
-    ActivityCardItem(
-        id = n.id,
-        title = n.title,
-        subtitle = n.subtitle,
-        categories = n.categories.map { it.displayName() } + listOf("${n.taskIds.size} atividades"),
-        iconType = ActivityIconType.BOOK,
-        iconColorHex = n.iconColorHex,
-    )
-}
-
-private fun buildGroups() = ActivitiesMockData.groups.map { g ->
-    ActivityCardItem(
-        id = g.id,
-        title = g.name,
-        subtitle = g.description,
-        categories = listOf(g.category.displayName(), "${g.notebookIds.size} cadernos"),
-        iconType = ActivityIconType.FOLDER,
-        iconColorHex = g.iconColorHex,
-    )
-}
-
-private fun buildTasks() = ActivitiesMockData.tasks.map { t ->
-    ActivityCardItem(
-        id = t.id,
-        title = t.prompt,
-        subtitle = "${t.alternatives.size} alternativas",
-        categories = listOf(t.category.displayName()),
-        iconType = ActivityIconType.DOCUMENT,
-        iconColorHex = 0xFFF4A0A0,
-    )
-}
-
-private fun buildAll() = buildNotebooks() + buildGroups() + buildTasks()
-
-private fun com.labirintodosaber.data.model.TaskCategory.displayName() = when (this) {
-    com.labirintodosaber.data.model.TaskCategory.READING -> "Leitura"
-    com.labirintodosaber.data.model.TaskCategory.WRITING -> "Escrita"
-    com.labirintodosaber.data.model.TaskCategory.VOCABULARY -> "Vocabulário"
-    com.labirintodosaber.data.model.TaskCategory.COMPREHENSION -> "Compreensão"
+    data object OnRetry : ActivitiesAction
 }

@@ -107,19 +107,17 @@ fun AppNavGraph(
         composable(
             route = AppDestination.GroupDetail.route,
             arguments = listOf(navArgument("groupId") { type = NavType.StringType }),
-        ) { backStackEntry ->
+        ) {
             GroupDetailScreen(
-                groupId = backStackEntry.arguments?.getString("groupId") ?: "",
                 onBackClick = { navController.popBackStack() },
-                onNotebookClick = { id -> navController.navigate(AppDestination.NotebookDetail.createRoute(id)) },
+                onTaskClick = { id -> navController.navigate(AppDestination.ActivityAnswer.createRoute(id)) },
             )
         }
         composable(
             route = AppDestination.NotebookDetail.route,
             arguments = listOf(navArgument("notebookId") { type = NavType.StringType }),
-        ) { backStackEntry ->
+        ) {
             NotebookDetailScreen(
-                notebookId = backStackEntry.arguments?.getString("notebookId") ?: "",
                 onBackClick = { navController.popBackStack() },
                 onTaskClick = { id -> navController.navigate(AppDestination.ActivityAnswer.createRoute(id)) },
             )
@@ -127,9 +125,8 @@ fun AppNavGraph(
         composable(
             route = AppDestination.ActivityAnswer.route,
             arguments = listOf(navArgument("taskId") { type = NavType.StringType }),
-        ) { backStackEntry ->
+        ) {
             ActivityAnswerScreen(
-                taskId = backStackEntry.arguments?.getString("taskId") ?: "",
                 onBackClick = { navController.popBackStack() },
             )
         }

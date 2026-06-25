@@ -29,10 +29,6 @@ class StudentsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(StudentsUiState())
     val uiState: StateFlow<StudentsUiState> = _uiState.asStateFlow()
 
-    init {
-        loadStudents()
-    }
-
     fun onAction(action: StudentsAction) {
         when (action) {
             is StudentsAction.OnSearchChange -> _uiState.update { it.copy(searchQuery = action.query) }
@@ -41,16 +37,22 @@ class StudentsViewModel @Inject constructor(
         }
     }
 
+    /** Recarrega a lista. Chamado ao entrar e sempre que a tela é retomada (volta de cadastro). */
+    fun refresh() = loadStudents()
+
     private fun loadStudents() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            val isFirstLoad = _uiState.value.students.isEmpty()
+            if (isFirstLoad) _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             when (val result = studentRepository.list()) {
                 is ApiResult.Success -> {
                     val items = mapWithProgress(result.data)
-                    _uiState.update { it.copy(isLoading = false, students = items) }
+                    _uiState.update { it.copy(isLoading = false, students = items, errorMessage = null) }
                 }
                 is ApiResult.Error -> _uiState.update {
-                    it.copy(isLoading = false, errorMessage = result.message)
+                    // Em refresh silencioso (já há dados), mantém a lista atual em vez de mostrar erro.
+                    if (isFirstLoad) it.copy(isLoading = false, errorMessage = result.message)
+                    else it.copy(isLoading = false)
                 }
             }
         }

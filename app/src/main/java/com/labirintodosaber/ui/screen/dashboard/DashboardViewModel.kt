@@ -40,9 +40,8 @@ class DashboardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
-    init {
-        load()
-    }
+    /** Recarrega ao entrar e ao retomar a tela (volta de cadastro de aluno, etc.). */
+    fun refresh() = load()
 
     fun onAction(action: DashboardAction) {
         when (action) {
@@ -57,7 +56,8 @@ class DashboardViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            val isFirstLoad = _uiState.value.userName.isEmpty()
+            if (isFirstLoad) _uiState.update { it.copy(isLoading = true) }
 
             val userName = authRepository.me().getOrNull()?.name ?: ""
             val students = studentRepository.list().getOrNull().orEmpty()
