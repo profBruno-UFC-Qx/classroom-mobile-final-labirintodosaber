@@ -27,8 +27,15 @@ data class ReportSessionPreview(
     val score: String,
 )
 
+data class ReportStudentOption(
+    val id: String,
+    val name: String,
+)
+
 data class ReportsUiState(
     val studentQuery: String = "",
+    val studentResults: List<ReportStudentOption> = emptyList(),
+    val selectedStudentId: String? = null,
     val selectedStudentName: String? = null,
     val selectedPeriod: ReportPeriod = ReportPeriod.LAST_3_MONTHS,
     val sessionPreviews: List<ReportSessionPreview> = emptyList(),
@@ -44,6 +51,7 @@ data class ReportsUiState(
 
 sealed interface ReportsAction {
     data class OnStudentQueryChange(val query: String) : ReportsAction
+    data class OnStudentSelect(val studentId: String) : ReportsAction
     data class OnPeriodSelect(val period: ReportPeriod) : ReportsAction
     data class OnToggleMetrics(val checked: Boolean) : ReportsAction
     data class OnToggleQualitative(val checked: Boolean) : ReportsAction
@@ -63,7 +71,7 @@ class ReportsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ReportsUiState())
     val uiState: StateFlow<ReportsUiState> = _uiState.asStateFlow()
 
-    private var students: List<StudentRef> = emptyList()
+    private var allStudents: List<ReportStudentOption> = emptyList()
     private var currentSessions: List<TaskNotebookSession> = emptyList()
 
     init {
@@ -73,6 +81,7 @@ class ReportsViewModel @Inject constructor(
     fun onAction(action: ReportsAction) {
         when (action) {
             is ReportsAction.OnStudentQueryChange -> onQueryChange(action.query)
+            is ReportsAction.OnStudentSelect -> onStudentSelect(action.studentId)
             is ReportsAction.OnPeriodSelect -> {
                 val showPicker = action.period == ReportPeriod.CUSTOM
                 _uiState.update { it.copy(selectedPeriod = action.period, showDateRangePicker = showPicker) }
@@ -99,26 +108,29 @@ class ReportsViewModel @Inject constructor(
 
     private fun loadStudents() {
         viewModelScope.launch {
-            students = studentRepository.list().getOrNull()
-                ?.map { StudentRef(it.id, it.name) }
+            allStudents = studentRepository.list().getOrNull()
+                ?.map { ReportStudentOption(it.id, it.name) }
+                ?.sortedBy { it.name }
                 .orEmpty()
+            _uiState.update { it.copy(studentResults = filterStudents(it.studentQuery)) }
         }
     }
 
     private fun onQueryChange(query: String) {
-        _uiState.update { it.copy(studentQuery = query) }
-        val match = if (query.isBlank()) null
-        else students.firstOrNull { it.name.contains(query, ignoreCase = true) }
+        _uiState.update { it.copy(studentQuery = query, studentResults = filterStudents(query)) }
+    }
 
-        if (match == null) {
-            currentSessions = emptyList()
-            _uiState.update { it.copy(selectedStudentName = null, sessionPreviews = emptyList(), canExport = false) }
-            return
+    private fun filterStudents(query: String): List<ReportStudentOption> =
+        if (query.isBlank()) allStudents
+        else allStudents.filter { it.name.contains(query, ignoreCase = true) }
+
+    private fun onStudentSelect(studentId: String) {
+        val student = allStudents.firstOrNull { it.id == studentId } ?: return
+        _uiState.update {
+            it.copy(selectedStudentId = student.id, selectedStudentName = student.name, isLoading = true)
         }
-
-        _uiState.update { it.copy(selectedStudentName = match.name, isLoading = true) }
         viewModelScope.launch {
-            currentSessions = sessionRepository.listByStudent(match.id).getOrNull().orEmpty()
+            currentSessions = sessionRepository.listByStudent(student.id).getOrNull().orEmpty()
             _uiState.update { it.copy(isLoading = false) }
             recomputePreviews()
         }
@@ -157,8 +169,6 @@ class ReportsViewModel @Inject constructor(
         _uiState.update { it.copy(sessionPreviews = previews, canExport = previews.isNotEmpty()) }
     }
 }
-
-private data class StudentRef(val id: String, val name: String)
 
 private fun Instant.minusDaysCompat(days: Long): Instant = this.minusSeconds(days * 24 * 60 * 60)
 

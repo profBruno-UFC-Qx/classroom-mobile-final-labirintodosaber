@@ -204,6 +204,25 @@ private fun ReportsContent(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                 )
+
+                if (uiState.studentResults.isEmpty()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(R.string.reports_no_students),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary,
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    uiState.studentResults.forEach { student ->
+                        StudentOptionRow(
+                            name = student.name,
+                            selected = student.id == uiState.selectedStudentId,
+                            onClick = { onAction(ReportsAction.OnStudentSelect(student.id)) },
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
+                }
             }
 
             // Step 2 — Período
@@ -513,6 +532,50 @@ private fun PeriodOptionRow(
                     color = TealPrimary.copy(alpha = 0.8f),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun StudentOptionRow(
+    name: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val borderColor = if (selected) TealPrimary else InputBorder
+    val bgColor = if (selected) Color(0xFFEBFAF9) else Color.White
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(bgColor)
+            .border(if (selected) 1.5.dp else 1.dp, borderColor, RoundedCornerShape(10.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Person,
+            contentDescription = null,
+            tint = if (selected) TealPrimary else TextSecondary,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (selected) TealPrimary else TextPrimary,
+            modifier = Modifier.weight(1f),
+        )
+        if (selected) {
+            Icon(
+                imageVector = Icons.Outlined.CheckBox,
+                contentDescription = null,
+                tint = TealPrimary,
+                modifier = Modifier.size(20.dp),
+            )
         }
     }
 }
