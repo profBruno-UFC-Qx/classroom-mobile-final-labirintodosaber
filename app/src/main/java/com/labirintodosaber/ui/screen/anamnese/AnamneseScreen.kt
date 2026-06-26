@@ -1,6 +1,7 @@
 package com.labirintodosaber.ui.screen.anamnese
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +54,7 @@ fun AnamneseScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     AnamneseContent(
         uiState = uiState,
+        onAction = viewModel::onAction,
         onBack = onBack,
         onProfileClick = onProfileClick,
         modifier = modifier,
@@ -62,6 +65,7 @@ fun AnamneseScreen(
 @Composable
 private fun AnamneseContent(
     uiState: AnamneseUiState,
+    onAction: (AnamneseAction) -> Unit,
     onBack: () -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -86,15 +90,46 @@ private fun AnamneseContent(
         },
         containerColor = Color(0xFFF5F5F5),
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            items(uiState.models) { model ->
-                AnamneseModelCard(model = model)
+        when {
+            uiState.isLoading -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = TealPrimary)
+            }
+
+            uiState.errorMessage != null -> Column(
+                modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                Spacer(modifier = Modifier.size(12.dp))
+                Surface(
+                    shape = RoundedCornerShape(50.dp),
+                    color = TealPrimary,
+                    onClick = { onAction(AnamneseAction.OnRetry) },
+                ) {
+                    Text(
+                        text = stringResource(R.string.students_retry),
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                    )
+                }
+            }
+
+            uiState.models.isEmpty() -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Text("Nenhum modelo de anamnese cadastrado.", style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+            }
+
+            else -> LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(uiState.models) { model ->
+                    AnamneseModelCard(model = model)
+                }
             }
         }
     }
