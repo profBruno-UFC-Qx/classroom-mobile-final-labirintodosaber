@@ -128,28 +128,42 @@ private fun SessionReportContent(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    HeaderMetric(
-                        label = stringResource(R.string.session_report_student),
-                        value = uiState.studentName,
-                    )
-                    HeaderMetric(
-                        label = stringResource(R.string.session_report_date),
-                        value = uiState.date,
-                    )
-                    HeaderMetric(
-                        label = stringResource(R.string.session_report_professional),
-                        value = uiState.professional,
-                    )
-                    HeaderMetric(
-                        label = stringResource(R.string.session_report_total_questions),
-                        value = stringResource(R.string.session_report_questions_count, uiState.totalQuestions),
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        HeaderMetric(
+                            modifier = Modifier.weight(1f),
+                            label = stringResource(R.string.session_report_student),
+                            value = uiState.studentName,
+                        )
+                        HeaderMetric(
+                            modifier = Modifier.weight(1f),
+                            label = stringResource(R.string.session_report_date),
+                            value = uiState.date,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        HeaderMetric(
+                            modifier = Modifier.weight(1f),
+                            label = stringResource(R.string.session_report_professional),
+                            value = uiState.professional,
+                        )
+                        HeaderMetric(
+                            modifier = Modifier.weight(1f),
+                            label = stringResource(R.string.session_report_total_questions),
+                            value = stringResource(R.string.session_report_questions_count, uiState.totalQuestions),
+                        )
+                    }
                 }
             }
 
@@ -158,14 +172,21 @@ private fun SessionReportContent(
                 icon = Icons.Outlined.AccessTime,
                 title = stringResource(R.string.session_report_time_title),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    TimeMetric(label = stringResource(R.string.session_report_total_time),    value = uiState.totalTime,       valueColor = TextPrimary)
-                    TimeMetric(label = stringResource(R.string.session_report_avg_response),  value = uiState.avgResponseTime, valueColor = TextPrimary)
-                    TimeMetric(label = stringResource(R.string.session_report_avg_correct),   value = uiState.avgCorrectTime,  valueColor = Color(0xFF16A34A))
-                    TimeMetric(label = stringResource(R.string.session_report_avg_wrong),     value = uiState.avgWrongTime,    valueColor = Color(0xFFDC2626))
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_total_time),   value = uiState.totalTime,       valueColor = TextPrimary)
+                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_avg_response), value = uiState.avgResponseTime, valueColor = TextPrimary)
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_avg_correct), value = uiState.avgCorrectTime, valueColor = Color(0xFF16A34A))
+                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_avg_wrong),   value = uiState.avgWrongTime,   valueColor = Color(0xFFDC2626))
+                    }
                 }
             }
 
@@ -175,38 +196,37 @@ private fun SessionReportContent(
                 title = stringResource(R.string.session_report_category_title),
             ) {
                 uiState.categoryAccuracy.forEachIndexed { index, item ->
-                    if (index > 0) Spacer(modifier = Modifier.height(10.dp))
+                    if (index > 0) Spacer(modifier = Modifier.height(14.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text(
                             text = item.label,
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextPrimary,
-                            modifier = Modifier.width(110.dp),
                         )
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(8.dp)
-                                .clip(RoundedCornerShape(50.dp))
-                                .background(Color(0xFFE5E7EB)),
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(item.percent / 100f)
-                                    .height(8.dp)
-                                    .clip(RoundedCornerShape(50.dp))
-                                    .background(Color(item.colorHex)),
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "${item.percent}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = TextSecondary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(item.colorHex),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(Color(0xFFE5E7EB)),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth((item.percent / 100f).coerceIn(0f, 1f))
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(50.dp))
+                                .background(Color(item.colorHex)),
                         )
                     }
                 }
@@ -226,34 +246,24 @@ private fun SessionReportContent(
                     ) {
                         pair.forEach { item ->
                             Column(modifier = Modifier.weight(1f)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Text(
-                                        text = item.label,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = TextPrimary,
-                                        fontWeight = FontWeight.Medium,
-                                    )
-                                    Text(
-                                        text = "${item.count} atividades",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = TextSecondary,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = item.label,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextPrimary,
+                                    fontWeight = FontWeight.Medium,
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(28.dp)
-                                        .clip(RoundedCornerShape(6.dp))
+                                        .height(36.dp)
+                                        .clip(RoundedCornerShape(8.dp))
                                         .background(Color(0xFFCBEAE6)),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
                                         text = "${item.percent}%",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = TealPrimary,
                                     )
