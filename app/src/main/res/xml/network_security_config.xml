@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Permite tráfego em texto claro (HTTP) apenas para os hosts de desenvolvimento.
+    10.0.2.2 é o alias do localhost da máquina host visto de dentro do emulador Android.
+    Em produção a API roda em HTTPS, portanto nenhuma exceção de cleartext é necessária.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+</network-security-config>
