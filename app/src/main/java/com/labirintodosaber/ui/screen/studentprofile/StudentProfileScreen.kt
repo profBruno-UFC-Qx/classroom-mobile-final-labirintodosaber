@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Card
@@ -60,6 +61,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 @Composable
 fun StudentProfileScreen(
     onBackClick: () -> Unit,
+    onSessionClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: StudentProfileViewModel = hiltViewModel(),
 ) {
@@ -68,6 +70,7 @@ fun StudentProfileScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onBackClick = onBackClick,
+        onSessionClick = onSessionClick,
         modifier = modifier,
     )
 }
@@ -78,6 +81,7 @@ private fun StudentProfileContent(
     uiState: StudentProfileUiState,
     onAction: (StudentProfileAction) -> Unit,
     onBackClick: () -> Unit,
+    onSessionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -127,7 +131,7 @@ private fun StudentProfileContent(
 
             when (uiState.selectedTab) {
                 StudentProfileTab.PROGRESS -> ProgressTabContent(uiState = uiState)
-                StudentProfileTab.SESSIONS -> SessionsTabContent(sessions = uiState.sessions)
+                StudentProfileTab.SESSIONS -> SessionsTabContent(sessions = uiState.sessions, onSessionClick = onSessionClick)
                 StudentProfileTab.DOCUMENTS -> DocumentsTabContent(documents = uiState.documents)
                 StudentProfileTab.ANAMNESE -> AnamneseTabContent(anamneses = uiState.anamneses)
             }
@@ -386,6 +390,7 @@ private fun CategoryProgressRow(
 @Composable
 private fun SessionsTabContent(
     sessions: List<SessionRow>,
+    onSessionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TabCard(modifier = modifier) {
@@ -394,7 +399,9 @@ private fun SessionsTabContent(
         } else {
             sessions.forEachIndexed { index, session ->
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSessionClick(session.id) },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -422,6 +429,13 @@ private fun SessionsTabContent(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = TealPrimary,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = TextSecondary,
+                        modifier = Modifier.size(18.dp),
                     )
                 }
                 if (index < sessions.lastIndex) {

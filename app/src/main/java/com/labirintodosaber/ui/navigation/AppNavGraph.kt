@@ -251,9 +251,15 @@ fun AppNavGraph(
             composable(
                 route = AppDestination.StudentProfile.route,
                 arguments = listOf(navArgument("studentId") { type = NavType.StringType }),
-            ) {
+            ) { backStackEntry ->
+                val profileStudentId = backStackEntry.arguments?.getString("studentId").orEmpty()
                 StudentProfileScreen(
                     onBackClick = { navController.popBackStack() },
+                    onSessionClick = { sessionId ->
+                        navController.navigate(
+                            AppDestination.SessionReport.createRoute(sessionId, profileStudentId)
+                        )
+                    },
                 )
             }
             composable(AppDestination.Activities.route) {
