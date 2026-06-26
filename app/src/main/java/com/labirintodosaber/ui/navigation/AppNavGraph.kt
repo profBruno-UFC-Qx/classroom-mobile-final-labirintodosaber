@@ -37,6 +37,7 @@ import com.labirintodosaber.ui.screen.login.LoginScreen
 import com.labirintodosaber.ui.screen.notebookdetail.NotebookDetailScreen
 import com.labirintodosaber.ui.screen.privacy.PrivacyScreen
 import com.labirintodosaber.ui.screen.register.RegisterScreen
+import com.labirintodosaber.ui.screen.reportpdf.ReportPdfScreen
 import com.labirintodosaber.ui.screen.reports.ReportsScreen
 import com.labirintodosaber.ui.screen.sessionconfigure.SessionConfigureScreen
 import com.labirintodosaber.ui.screen.sessionreport.SessionReportScreen
@@ -331,6 +332,15 @@ fun AppNavGraph(
                     onSaveSuccess = { navController.popBackStack() },
                 )
             }
+            composable(
+                route = AppDestination.ReportPdf.route,
+                arguments = listOf(navArgument("filePath") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                ReportPdfScreen(
+                    filePath = backStackEntry.arguments?.getString("filePath").orEmpty(),
+                    onBack = { navController.popBackStack() },
+                )
+            }
             composable(AppDestination.UserProfile.route) {
                 UserProfileScreen(
                     onBack = { navController.popBackStack() },
@@ -426,6 +436,9 @@ sealed class AppDestination(val route: String) {
             contentIds: String,
             sessionName: String,
         ) = "session/run/$studentId/${Uri.encode(contentIds)}/${Uri.encode(sessionName)}"
+    }
+    data object ReportPdf : AppDestination("report-pdf/{filePath}") {
+        fun createRoute(filePath: String) = "report-pdf/${Uri.encode(filePath)}"
     }
     data object UserProfile : AppDestination("user-profile")
     data object Privacy : AppDestination("privacy")

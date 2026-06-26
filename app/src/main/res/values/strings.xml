@@ -273,4 +273,8 @@
     <string name="session_report_char_count">%1$d caracteres</string>
     <string name="session_report_descriptive_placeholder">Adicione observações detalhadas sobre o desempenho do aluno durante a sessão…</string>
     <string name="session_report_save">Salvar Relatório</string>
+
+    <!-- Report PDF -->
+    <string name="report_pdf_title">Relatório (PDF)</string>
+    <string name="report_pdf_error">Não foi possível abrir o relatório.</string>
 </resources>
