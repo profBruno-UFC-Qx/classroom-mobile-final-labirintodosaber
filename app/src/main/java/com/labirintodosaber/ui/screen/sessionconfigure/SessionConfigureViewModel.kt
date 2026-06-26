@@ -3,7 +3,13 @@ package com.labirintodosaber.ui.screen.sessionconfigure
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.labirintodosaber.data.remote.getOrNull
+import com.labirintodosaber.data.repository.TaskGroupRepository
+import com.labirintodosaber.data.repository.TaskNotebookRepository
+import com.labirintodosaber.data.repository.TaskRepository
+import com.labirintodosaber.ui.screen.activities.displayName
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +31,7 @@ data class SessionContentItem(
     val title: String,
     val description: String,
     val tags: List<String>,
+    val taskIds: List<String>,
 )
 
 data class SessionConfigureUiState(
@@ -38,6 +45,8 @@ data class SessionConfigureUiState(
     val totalPages: Int = 1,
     val selectedContentIds: Set<String> = emptySet(),
     val canStart: Boolean = false,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 val SessionConfigureUiState.visibleContent: List<SessionContentItem>
@@ -55,6 +64,7 @@ sealed interface SessionConfigureAction {
     data class OnPageChange(val page: Int) : SessionConfigureAction
     data object OnStartSession : SessionConfigureAction
     data object OnBack : SessionConfigureAction
+    data object OnRetry : SessionConfigureAction
 }
 
 sealed interface SessionConfigureEvent {
@@ -68,53 +78,11 @@ sealed interface SessionConfigureEvent {
 
 private const val PAGE_SIZE = 3
 
-private val MOCK_CONTENT_ITEMS = listOf(
-    SessionContentItem(
-        id = "nb1", type = ContentType.NOTEBOOK,
-        title = "Alfabetização Divertida",
-        description = "Atividades de reconhecimento de letras e sons",
-        tags = listOf("Vocabulário", "Leitura"),
-    ),
-    SessionContentItem(
-        id = "nb2", type = ContentType.NOTEBOOK,
-        title = "Histórias Ilustradas",
-        description = "Compreensão de histórias curtas com imagens",
-        tags = listOf("Leitura", "Compreensão"),
-    ),
-    SessionContentItem(
-        id = "g1", type = ContentType.GROUP,
-        title = "Matemática Básica",
-        description = "Exercícios de soma e subtração",
-        tags = listOf("Cálculo"),
-    ),
-    SessionContentItem(
-        id = "g2", type = ContentType.GROUP,
-        title = "Vogais e Consoantes",
-        description = "Identificação de vogais em palavras",
-        tags = listOf("Vocabulário"),
-    ),
-    SessionContentItem(
-        id = "t1", type = ContentType.ACTIVITY,
-        title = "Qual animal a figura representa?",
-        description = "Múltipla escolha com imagem",
-        tags = listOf("Vocabulário"),
-    ),
-    SessionContentItem(
-        id = "t2", type = ContentType.ACTIVITY,
-        title = "Complete a palavra",
-        description = "Preencha a letra que falta",
-        tags = listOf("Escrita"),
-    ),
-    SessionContentItem(
-        id = "t3", type = ContentType.ACTIVITY,
-        title = "Quantos objetos há?",
-        description = "Contagem visual de objetos",
-        tags = listOf("Cálculo"),
-    ),
-)
-
 @HiltViewModel
 class SessionConfigureViewModel @Inject constructor(
+    private val taskNotebookRepository: TaskNotebookRepository,
+    private val taskGroupRepository: TaskGroupRepository,
+    private val taskRepository: TaskRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -126,6 +94,9 @@ class SessionConfigureViewModel @Inject constructor(
     private val _events = Channel<SessionConfigureEvent>(Channel.BUFFERED)
     val events: Flow<SessionConfigureEvent> = _events.receiveAsFlow()
 
+    /** Conteúdo completo carregado; filtro/busca operam sobre ele. */
+    private var loadedContent: List<SessionContentItem> = emptyList()
+
     init {
         loadContent()
     }
@@ -134,7 +105,6 @@ class SessionConfigureViewModel @Inject constructor(
         when (action) {
             is SessionConfigureAction.OnSessionNameChange -> {
                 _uiState.update { it.copy(sessionName = action.name, sessionNameError = false) }
-                checkCanStart()
             }
             is SessionConfigureAction.OnContentQueryChange -> {
                 _uiState.update { it.copy(contentQuery = action.query) }
@@ -152,6 +122,7 @@ class SessionConfigureViewModel @Inject constructor(
             }
             is SessionConfigureAction.OnPageChange -> _uiState.update { it.copy(currentPage = action.page) }
             SessionConfigureAction.OnStartSession -> startSession()
+            SessionConfigureAction.OnRetry -> loadContent()
             SessionConfigureAction.OnBack -> viewModelScope.launch {
                 _events.send(SessionConfigureEvent.NavigateBack)
             }
@@ -159,13 +130,70 @@ class SessionConfigureViewModel @Inject constructor(
     }
 
     private fun loadContent() {
-        val total = ceil(MOCK_CONTENT_ITEMS.size / PAGE_SIZE.toDouble()).toInt()
-        _uiState.update { it.copy(allContent = MOCK_CONTENT_ITEMS, totalPages = maxOf(1, total)) }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val notebooksDeferred = async { taskNotebookRepository.list().getOrNull() }
+            val groupsDeferred = async { taskGroupRepository.listByEducator().getOrNull() }
+            val tasksDeferred = async { taskRepository.list().getOrNull() }
+
+            val notebooks = notebooksDeferred.await()
+            val groups = groupsDeferred.await()
+            val tasks = tasksDeferred.await()
+
+            if (notebooks == null || groups == null || tasks == null) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Não foi possível carregar o conteúdo.") }
+                return@launch
+            }
+
+            val items = buildList {
+                notebooks.forEach { nb ->
+                    add(
+                        SessionContentItem(
+                            id = nb.notebook.id,
+                            type = ContentType.NOTEBOOK,
+                            title = nb.notebook.description,
+                            description = "${nb.notebook.tasks.size} atividades",
+                            tags = listOf(nb.notebook.category.displayName()),
+                            taskIds = nb.notebook.tasks,
+                        )
+                    )
+                }
+                groups.forEach { g ->
+                    add(
+                        SessionContentItem(
+                            id = g.id,
+                            type = ContentType.GROUP,
+                            title = g.name,
+                            description = "${g.tasksIds.size} atividades",
+                            tags = listOf(g.category.displayName()),
+                            taskIds = g.tasksIds,
+                        )
+                    )
+                }
+                tasks.forEach { t ->
+                    add(
+                        SessionContentItem(
+                            id = t.id,
+                            type = ContentType.ACTIVITY,
+                            title = t.prompt,
+                            description = "${t.alternatives.size} alternativas",
+                            tags = listOf(t.category.displayName()),
+                            taskIds = listOf(t.id),
+                        )
+                    )
+                }
+            }
+
+            loadedContent = items
+            _uiState.update { it.copy(isLoading = false) }
+            applyFilter()
+        }
     }
 
     private fun applyFilter() {
         val state = _uiState.value
-        var filtered = MOCK_CONTENT_ITEMS
+        var filtered = loadedContent
 
         filtered = when (state.activeFilter) {
             ContentFilter.ALL -> filtered
@@ -192,12 +220,20 @@ class SessionConfigureViewModel @Inject constructor(
             _uiState.update { it.copy(sessionNameError = true) }
             return
         }
-        if (state.selectedContentIds.isEmpty()) return
+        // Resolve o conteúdo selecionado (cadernos/grupos/atividades) numa lista de task ids.
+        val taskIds = loadedContent
+            .filter { it.id in state.selectedContentIds }
+            .flatMap { it.taskIds }
+            .distinct()
+        if (taskIds.isEmpty()) {
+            _uiState.update { it.copy(errorMessage = "O conteúdo selecionado não tem atividades.") }
+            return
+        }
         viewModelScope.launch {
             _events.send(
                 SessionConfigureEvent.NavigateToRun(
                     studentId = state.studentId,
-                    contentIds = state.selectedContentIds.joinToString(","),
+                    contentIds = taskIds.joinToString(","),
                     sessionName = state.sessionName,
                 )
             )

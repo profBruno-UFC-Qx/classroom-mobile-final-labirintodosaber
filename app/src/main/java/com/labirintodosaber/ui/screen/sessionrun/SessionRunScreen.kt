@@ -30,6 +30,7 @@ import androidx.compose.material.icons.outlined.ZoomIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +39,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.screen.sessionselectstudent.SessionBottomBar
 import com.labirintodosaber.ui.screen.sessionselectstudent.SessionTopBar
@@ -64,16 +67,20 @@ import com.labirintodosaber.ui.theme.TextSecondary
 @Composable
 fun SessionRunScreen(
     onBack: () -> Unit,
-    onFinishSession: () -> Unit = onBack,
+    onFinishSession: (String) -> Unit = { onBack() },
     modifier: Modifier = Modifier,
     viewModel: SessionRunViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(uiState.navigateSessionId) {
+        uiState.navigateSessionId?.let { onFinishSession(it) }
+    }
+
     SessionRunContent(
         uiState = uiState,
         onAction = viewModel::onAction,
-        onFinish = onFinishSession,
+        onFinish = { viewModel.onAction(SessionRunAction.OnFinishSession) },
         modifier = modifier,
     )
 }
@@ -104,9 +111,33 @@ private fun SessionRunContent(
         },
         containerColor = Color.White,
     ) { padding ->
-        if (uiState.isFinished) {
-            SessionFinishedContent(modifier = Modifier.padding(padding))
-        } else {
+        when {
+            uiState.isLoading -> Box(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(color = TealPrimary)
+            }
+
+            uiState.errorMessage != null -> Box(
+                modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(uiState.errorMessage, color = TextSecondary, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = { onAction(SessionRunAction.OnRetryLoad) },
+                        colors = ButtonDefaults.buttonColors(containerColor = TealPrimary),
+                    ) {
+                        Text(stringResource(R.string.students_retry), color = Color.White)
+                    }
+                }
+            }
+
+            uiState.isFinished -> SessionFinishedContent(modifier = Modifier.padding(padding))
+
+            else -> {
             val task = uiState.currentTask
             if (task != null) {
                 Column(
@@ -121,9 +152,9 @@ private fun SessionRunContent(
                         onToggle = { onAction(SessionRunAction.OnToggleTimer) },
                     )
 
-                    if (task.imageRes != null) {
+                    if (task.imageUrl != null) {
                         TaskImageCard(
-                            imageRes = task.imageRes,
+                            imageUrl = task.imageUrl,
                             modifier = Modifier.padding(horizontal = 16.dp),
                             onZoomClick = { onAction(SessionRunAction.OnZoomImage) },
                         )
@@ -169,13 +200,14 @@ private fun SessionRunContent(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
+            }
         }
     }
 
     val task = uiState.currentTask
-    if (uiState.showImageZoom && task?.imageRes != null) {
+    if (uiState.showImageZoom && task?.imageUrl != null) {
         ImageZoomDialog(
-            imageRes = task.imageRes,
+            imageUrl = task.imageUrl,
             onDismiss = { onAction(SessionRunAction.OnDismissZoom) },
         )
     }
@@ -235,7 +267,7 @@ private fun TimerRow(
 
 @Composable
 private fun TaskImageCard(
-    imageRes: Int,
+    imageUrl: String,
     onZoomClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -246,8 +278,8 @@ private fun TaskImageCard(
             .background(Color(0xFFF8FAFA))
             .aspectRatio(1.4f),
     ) {
-        Image(
-            painter = painterResource(imageRes),
+        AsyncImage(
+            model = imageUrl,
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier
@@ -423,7 +455,7 @@ private fun ConfirmAnswerButton(
 
 @Composable
 private fun ImageZoomDialog(
-    imageRes: Int,
+    imageUrl: String,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
@@ -440,8 +472,8 @@ private fun ImageZoomDialog(
                     .aspectRatio(1f),
                 contentAlignment = Alignment.Center,
             ) {
-                Image(
-                    painter = painterResource(imageRes),
+                AsyncImage(
+                    model = imageUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize(),

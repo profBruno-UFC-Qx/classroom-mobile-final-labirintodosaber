@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +74,13 @@ fun AppNavGraph(
         AppDestination.Reports.route,
     )
     val drawerEnabled = currentRoute in mainRoutes
+
+    // Carrega o educador quando chega numa tela principal já autenticado (o init do VM roda antes do login).
+    LaunchedEffect(currentRoute) {
+        if (currentRoute in mainRoutes && profileUiState.displayName.isBlank()) {
+            profileViewModel.refresh()
+        }
+    }
 
     val onMenuClick: () -> Unit = {
         if (drawerEnabled) scope.launch { drawerState.open() }
@@ -163,17 +171,26 @@ fun AppNavGraph(
                     navArgument("contentIds") { type = NavType.StringType },
                     navArgument("sessionName") { type = NavType.StringType },
                 ),
-            ) {
+            ) { backStackEntry ->
+                val sessionStudentId = backStackEntry.arguments?.getString("studentId").orEmpty()
                 SessionRunScreen(
                     onBack = { navController.popBackStack() },
-                    onFinishSession = {
-                        navController.navigate(AppDestination.SessionReport.route) {
+                    onFinishSession = { sessionId ->
+                        navController.navigate(
+                            AppDestination.SessionReport.createRoute(sessionId, sessionStudentId)
+                        ) {
                             popUpTo(AppDestination.Dashboard.route) { inclusive = false }
                         }
                     },
                 )
             }
-            composable(AppDestination.SessionReport.route) {
+            composable(
+                route = AppDestination.SessionReport.route,
+                arguments = listOf(
+                    navArgument("sessionId") { type = NavType.StringType },
+                    navArgument("studentId") { type = NavType.StringType },
+                ),
+            ) {
                 SessionReportScreen(
                     onHomeClick = {
                         navController.navigate(AppDestination.Dashboard.route) {
@@ -390,7 +407,9 @@ sealed class AppDestination(val route: String) {
         fun createRoute(taskId: String) = "activity-answer/$taskId"
     }
     data object Reports : AppDestination("reports")
-    data object SessionReport : AppDestination("session-report")
+    data object SessionReport : AppDestination("session-report/{sessionId}/{studentId}") {
+        fun createRoute(sessionId: String, studentId: String) = "session-report/$sessionId/$studentId"
+    }
     data object SessionSelectStudent : AppDestination("session/select-student")
     data object SessionConfigure : AppDestination("session/configure/{studentId}") {
         fun createRoute(studentId: String) = "session/configure/$studentId"

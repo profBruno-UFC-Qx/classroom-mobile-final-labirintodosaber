@@ -3,6 +3,11 @@ package com.labirintodosaber.ui.screen.sessionrun
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.labirintodosaber.data.model.Task
+import com.labirintodosaber.data.remote.ApiResult
+import com.labirintodosaber.data.remote.getOrNull
+import com.labirintodosaber.data.repository.SessionRepository
+import com.labirintodosaber.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -21,7 +26,7 @@ data class SessionAlternative(
 
 data class SessionTaskItem(
     val id: String,
-    val imageRes: Int?,
+    val imageUrl: String?,
     val hasAudio: Boolean,
     val audioDurationLabel: String?,
     val prompt: String,
@@ -32,6 +37,7 @@ enum class AnswerResult { CORRECT, WRONG }
 
 data class SessionRunUiState(
     val studentId: String = "",
+    val sessionId: String? = null,
     val sessionName: String = "",
     val tasks: List<SessionTaskItem> = emptyList(),
     val currentTaskIndex: Int = 0,
@@ -42,6 +48,9 @@ data class SessionRunUiState(
     val elapsedSeconds: Int = 0,
     val isTimerRunning: Boolean = true,
     val showImageZoom: Boolean = false,
+    val isLoading: Boolean = true,
+    val errorMessage: String? = null,
+    val navigateSessionId: String? = null,
 )
 
 val SessionRunUiState.currentTask: SessionTaskItem?
@@ -69,57 +78,19 @@ sealed interface SessionRunAction {
     data object OnToggleTimer : SessionRunAction
     data object OnZoomImage : SessionRunAction
     data object OnDismissZoom : SessionRunAction
+    data object OnFinishSession : SessionRunAction
+    data object OnRetryLoad : SessionRunAction
 }
-
-private val MOCK_TASKS = listOf(
-    SessionTaskItem(
-        id = "q1",
-        imageRes = com.labirintodosaber.R.drawable.logo,
-        hasAudio = true,
-        audioDurationLabel = "00:02",
-        prompt = "Qual animal a figura representa?",
-        alternatives = listOf(
-            SessionAlternative(id = "a1", text = "GATO",      isCorrect = false),
-            SessionAlternative(id = "a2", text = "BORBOLETA", isCorrect = false),
-            SessionAlternative(id = "a3", text = "LEÃO",      isCorrect = true),
-            SessionAlternative(id = "a4", text = "CAVALO",    isCorrect = false),
-        ),
-    ),
-    SessionTaskItem(
-        id = "q2",
-        imageRes = null,
-        hasAudio = false,
-        audioDurationLabel = null,
-        prompt = "Qual é a primeira letra da palavra BANANA?",
-        alternatives = listOf(
-            SessionAlternative(id = "b1", text = "A", isCorrect = false),
-            SessionAlternative(id = "b2", text = "B", isCorrect = true),
-            SessionAlternative(id = "b3", text = "C", isCorrect = false),
-            SessionAlternative(id = "b4", text = "N", isCorrect = false),
-        ),
-    ),
-    SessionTaskItem(
-        id = "q3",
-        imageRes = null,
-        hasAudio = false,
-        audioDurationLabel = null,
-        prompt = "Quantas vogais tem a palavra ESCOLA?",
-        alternatives = listOf(
-            SessionAlternative(id = "c1", text = "2", isCorrect = false),
-            SessionAlternative(id = "c2", text = "3", isCorrect = true),
-            SessionAlternative(id = "c3", text = "4", isCorrect = false),
-            SessionAlternative(id = "c4", text = "5", isCorrect = false),
-        ),
-    ),
-)
 
 @HiltViewModel
 class SessionRunViewModel @Inject constructor(
+    private val taskRepository: TaskRepository,
+    private val sessionRepository: SessionRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val studentId: String = checkNotNull(savedStateHandle["studentId"])
-    private val contentIds: List<String> = checkNotNull(savedStateHandle.get<String>("contentIds"))
+    private val taskIds: List<String> = checkNotNull(savedStateHandle.get<String>("contentIds"))
         .split(",").filter { it.isNotEmpty() }
     private val sessionName: String = checkNotNull(savedStateHandle.get<String>("sessionName"))
 
@@ -130,34 +101,65 @@ class SessionRunViewModel @Inject constructor(
 
     private var timerJob: Job? = null
 
+    /** Segundo (no cronômetro) em que a tarefa atual começou a ser respondida. */
+    private var questionStartSeconds: Int = 0
+
     init {
-        loadTasks()
-        startTimer()
+        startSession()
     }
 
     fun onAction(action: SessionRunAction) {
         when (action) {
             is SessionRunAction.OnAlternativeSelect -> {
-                _uiState.update {
-                    it.copy(selectedAlternativeId = action.alternativeId, canConfirm = true)
+                if (_uiState.value.answerResult == null) {
+                    _uiState.update { it.copy(selectedAlternativeId = action.alternativeId, canConfirm = true) }
                 }
             }
             SessionRunAction.OnConfirmAnswer -> confirmAnswer()
             SessionRunAction.OnNextActivity -> nextActivity()
-            SessionRunAction.OnRetry -> {
-                _uiState.update { it.copy(selectedAlternativeId = null, canConfirm = false, answerResult = null) }
+            SessionRunAction.OnRetry -> _uiState.update {
+                it.copy(selectedAlternativeId = null, canConfirm = false, answerResult = null)
             }
             SessionRunAction.OnToggleAudio -> _uiState.update { it.copy(isAudioPlaying = !it.isAudioPlaying) }
             SessionRunAction.OnToggleTimer -> _uiState.update { it.copy(isTimerRunning = !it.isTimerRunning) }
             SessionRunAction.OnZoomImage -> _uiState.update { it.copy(showImageZoom = true) }
             SessionRunAction.OnDismissZoom -> _uiState.update { it.copy(showImageZoom = false) }
+            SessionRunAction.OnFinishSession -> finishSession()
+            SessionRunAction.OnRetryLoad -> startSession()
         }
     }
 
-    private fun loadTasks() {
-        val count = contentIds.size.coerceAtLeast(1)
-        val tasks = MOCK_TASKS.take(count)
-        _uiState.update { it.copy(tasks = tasks) }
+    private fun startSession() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            // Inicia a sessão (obtém o id) e carrega as tarefas escolhidas.
+            val startResult = sessionRepository.start(studentId, sessionName)
+            if (startResult is ApiResult.Error) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = startResult.message) }
+                return@launch
+            }
+            val sessionId = (startResult as ApiResult.Success).data.id
+
+            val allTasks = taskRepository.list().getOrNull()
+            if (allTasks == null) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Não foi possível carregar as atividades.") }
+                return@launch
+            }
+            // Preserva a ordem de seleção das tarefas.
+            val byId = allTasks.associateBy { it.id }
+            val tasks = taskIds.mapNotNull { byId[it] }.map { it.toSessionItem() }
+            if (tasks.isEmpty()) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Nenhuma atividade encontrada para esta sessão.") }
+                return@launch
+            }
+
+            questionStartSeconds = 0
+            _uiState.update {
+                it.copy(isLoading = false, sessionId = sessionId, tasks = tasks, elapsedSeconds = 0)
+            }
+            startTimer()
+        }
     }
 
     private fun confirmAnswer() {
@@ -166,9 +168,22 @@ class SessionRunViewModel @Inject constructor(
         val selected = task.alternatives.firstOrNull { it.id == state.selectedAlternativeId } ?: return
         val result = if (selected.isCorrect) AnswerResult.CORRECT else AnswerResult.WRONG
         _uiState.update { it.copy(answerResult = result) }
+
+        val sessionId = state.sessionId ?: return
+        val timeToAnswer = (state.elapsedSeconds - questionStartSeconds).coerceAtLeast(0)
+        // Envia a resposta à API (sem bloquear o feedback local).
+        viewModelScope.launch {
+            sessionRepository.answer(
+                sessionId = sessionId,
+                taskId = task.id,
+                selectedAlternativeId = selected.id,
+                timeToAnswer = timeToAnswer,
+            )
+        }
     }
 
     private fun nextActivity() {
+        questionStartSeconds = _uiState.value.elapsedSeconds
         _uiState.update {
             it.copy(
                 currentTaskIndex = it.currentTaskIndex + 1,
@@ -180,7 +195,18 @@ class SessionRunViewModel @Inject constructor(
         }
     }
 
+    private fun finishSession() {
+        val sessionId = _uiState.value.sessionId
+        viewModelScope.launch {
+            if (sessionId != null) {
+                sessionRepository.finish(sessionId)
+            }
+            _uiState.update { it.copy(navigateSessionId = sessionId ?: "") }
+        }
+    }
+
     private fun startTimer() {
+        timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (true) {
                 delay(1000L)
@@ -198,3 +224,12 @@ class SessionRunViewModel @Inject constructor(
         timerJob?.cancel()
     }
 }
+
+private fun Task.toSessionItem() = SessionTaskItem(
+    id = id,
+    imageUrl = imageFile?.takeIf { it.isNotBlank() },
+    hasAudio = !audioFile.isNullOrBlank(),
+    audioDurationLabel = if (!audioFile.isNullOrBlank()) "Áudio" else null,
+    prompt = prompt,
+    alternatives = alternatives.map { SessionAlternative(it.id, it.text, it.isCorrect) },
+)
