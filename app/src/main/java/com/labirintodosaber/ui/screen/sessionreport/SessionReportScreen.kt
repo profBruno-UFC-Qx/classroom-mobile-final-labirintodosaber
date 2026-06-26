@@ -1,6 +1,7 @@
 package com.labirintodosaber.ui.screen.sessionreport
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -46,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -57,6 +60,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.theme.InputBackground
 import com.labirintodosaber.ui.theme.InputBorder
+import com.labirintodosaber.ui.theme.TealDark
+import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
 import com.labirintodosaber.ui.theme.TextPrimary
 import com.labirintodosaber.ui.theme.TextSecondary
@@ -114,7 +119,37 @@ private fun SessionReportContent(
         },
         containerColor = Color(0xFFF5F5F5),
     ) { padding ->
-        Column(
+        val hasData = uiState.totalQuestions > 0 ||
+            uiState.categoryAccuracy.isNotEmpty() ||
+            uiState.studentName.isNotBlank()
+        when {
+            uiState.isLoading -> Box(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(color = TealPrimary)
+            }
+
+            uiState.errorMessage != null && !hasData -> Box(
+                modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(TealPrimary)
+                            .clickable { onAction(SessionReportAction.OnRetry) }
+                            .padding(horizontal = 20.dp, vertical = 10.dp),
+                    ) {
+                        Text(stringResource(R.string.students_retry), color = Color.White, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+
+            else -> Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
@@ -330,10 +365,39 @@ private fun SessionReportContent(
                             unfocusedContainerColor = InputBackground,
                         ),
                     )
+                    uiState.savedMessage?.let { msg ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(msg, style = MaterialTheme.typography.bodySmall, color = Color(0xFF16A34A))
+                    }
+                    if (uiState.errorMessage != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(uiState.errorMessage, style = MaterialTheme.typography.bodySmall, color = Color(0xFFDC2626))
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Brush.horizontalGradient(listOf(TealDark, TealLight)))
+                            .clickable(enabled = !uiState.isSaving) { onAction(SessionReportAction.OnSaveReport) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (uiState.isSaving) {
+                            CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                        } else {
+                            Text(
+                                text = stringResource(R.string.session_report_save),
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
+        }
         }
     }
 }
