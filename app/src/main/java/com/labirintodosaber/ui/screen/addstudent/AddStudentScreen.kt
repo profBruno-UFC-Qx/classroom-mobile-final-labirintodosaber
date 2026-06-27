@@ -29,13 +29,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -493,6 +495,7 @@ private fun FormTextField(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GenderDropdown(
     selected: String,
@@ -502,7 +505,11 @@ private fun GenderDropdown(
     val options = listOf("Masculino", "Feminino", "Outro")
     var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier,
+    ) {
         OutlinedTextField(
             value = selected,
             onValueChange = {},
@@ -511,12 +518,7 @@ private fun GenderDropdown(
                 Text(stringResource(R.string.add_student_gender_placeholder), style = MaterialTheme.typography.bodySmall, color = TextSecondary.copy(alpha = 0.5f))
             },
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = TextSecondary,
-                    modifier = Modifier.clickable { expanded = true },
-                )
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
             singleLine = true,
             shape = RoundedCornerShape(50.dp),
@@ -526,9 +528,12 @@ private fun GenderDropdown(
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White,
             ),
-            modifier = Modifier.fillMaxWidth().height(52.dp).clickable { expanded = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
         )
-        DropdownMenu(
+        ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
