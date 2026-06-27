@@ -40,6 +40,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -79,6 +80,14 @@ fun ForgotPasswordScreen(
     viewModel: ForgotPasswordViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.resetSuccess) {
+        if (uiState.resetSuccess) {
+            onBackClick()
+            viewModel.onAction(ForgotPasswordAction.OnResetHandled)
+        }
+    }
+
     ForgotPasswordContent(
         uiState = uiState,
         maskedEmail = viewModel::maskedEmail,
@@ -165,6 +174,18 @@ private fun ForgotPasswordContent(
                         onAction = onAction,
                     )
                 }
+            }
+
+            uiState.errorMessage?.let { message ->
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                )
             }
 
             Spacer(modifier = Modifier.height(28.dp))

@@ -20,9 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.theme.GradientBottom
 import com.labirintodosaber.ui.theme.TealLight
@@ -66,6 +67,7 @@ fun StudentProfileScreen(
     StudentProfileContent(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onBackClick = onBackClick,
         modifier = modifier,
     )
 }
@@ -75,6 +77,7 @@ fun StudentProfileScreen(
 private fun StudentProfileContent(
     uiState: StudentProfileUiState,
     onAction: (StudentProfileAction) -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -89,8 +92,12 @@ private fun StudentProfileContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: drawer */ }) {
-                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = stringResource(R.string.students_back_desc),
+                            tint = TextPrimary,
+                        )
                     }
                 },
                 actions = {
@@ -120,9 +127,9 @@ private fun StudentProfileContent(
 
             when (uiState.selectedTab) {
                 StudentProfileTab.PROGRESS -> ProgressTabContent(uiState = uiState)
-                StudentProfileTab.SESSIONS -> PlaceholderTabContent(label = stringResource(R.string.student_profile_tab_sessions))
-                StudentProfileTab.DOCUMENTS -> PlaceholderTabContent(label = stringResource(R.string.student_profile_tab_documents))
-                StudentProfileTab.ANAMNESE -> PlaceholderTabContent(label = stringResource(R.string.student_profile_tab_anamnese))
+                StudentProfileTab.SESSIONS -> SessionsTabContent(sessions = uiState.sessions)
+                StudentProfileTab.DOCUMENTS -> DocumentsTabContent(documents = uiState.documents)
+                StudentProfileTab.ANAMNESE -> AnamneseTabContent(anamneses = uiState.anamneses)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -148,18 +155,33 @@ private fun StudentInfoCard(
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.Top) {
+                val genericAvatar = painterResource(
+                    if (uiState.isGirl) R.drawable.girl_home else R.drawable.boy_home,
+                )
                 Box(
                     modifier = Modifier
                         .size(56.dp)
                         .border(2.dp, borderColor, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Image(
-                        painter = painterResource(if (uiState.isGirl) R.drawable.girl_home else R.drawable.boy_home),
-                        contentDescription = stringResource(R.string.student_profile_avatar_desc),
-                        modifier = Modifier.size(52.dp).clip(CircleShape),
-                        contentScale = ContentScale.Crop,
-                    )
+                    if (uiState.photoUrl != null) {
+                        AsyncImage(
+                            model = uiState.photoUrl,
+                            contentDescription = stringResource(R.string.student_profile_avatar_desc),
+                            placeholder = genericAvatar,
+                            error = genericAvatar,
+                            fallback = genericAvatar,
+                            modifier = Modifier.size(52.dp).clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                        )
+                    } else {
+                        Image(
+                            painter = genericAvatar,
+                            contentDescription = stringResource(R.string.student_profile_avatar_desc),
+                            modifier = Modifier.size(52.dp).clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -359,21 +381,164 @@ private fun CategoryProgressRow(
     }
 }
 
+// ── Sessões ───────────────────────────────────────────────────────────────────
+
 @Composable
-private fun PlaceholderTabContent(label: String, modifier: Modifier = Modifier) {
+private fun SessionsTabContent(
+    sessions: List<SessionRow>,
+    modifier: Modifier = Modifier,
+) {
+    TabCard(modifier = modifier) {
+        if (sessions.isEmpty()) {
+            EmptyTabMessage(text = stringResource(R.string.student_profile_sessions_empty))
+        } else {
+            sessions.forEachIndexed { index, session ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = session.name,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary,
+                            fontSize = 10.sp,
+                        )
+                        Text(
+                            text = if (session.finished) {
+                                stringResource(R.string.student_profile_session_finished, session.date, session.questionCount)
+                            } else {
+                                stringResource(R.string.student_profile_session_ongoing, session.date)
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TextSecondary,
+                            fontSize = 8.sp,
+                        )
+                    }
+                    Text(
+                        text = "${session.hitRatePercent}%",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = TealPrimary,
+                    )
+                }
+                if (index < sessions.lastIndex) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}
+
+// ── Documentos (relatórios gerados) ───────────────────────────────────────────
+
+@Composable
+private fun DocumentsTabContent(
+    documents: List<DocumentRow>,
+    modifier: Modifier = Modifier,
+) {
+    TabCard(modifier = modifier) {
+        if (documents.isEmpty()) {
+            EmptyTabMessage(text = stringResource(R.string.student_profile_documents_empty))
+        } else {
+            documents.forEachIndexed { index, document ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = document.title,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary,
+                            fontSize = 10.sp,
+                        )
+                        Text(
+                            text = document.period,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TextSecondary,
+                            fontSize = 8.sp,
+                        )
+                    }
+                    Text(
+                        text = "${document.accuracyPercent}%",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = TealPrimary,
+                    )
+                }
+                if (index < documents.lastIndex) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}
+
+// ── Anamneses ─────────────────────────────────────────────────────────────────
+
+@Composable
+private fun AnamneseTabContent(
+    anamneses: List<AnamneseRow>,
+    modifier: Modifier = Modifier,
+) {
+    TabCard(modifier = modifier) {
+        if (anamneses.isEmpty()) {
+            EmptyTabMessage(text = stringResource(R.string.student_profile_anamnese_empty))
+        } else {
+            anamneses.forEachIndexed { index, anamnese ->
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = anamnese.title,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary,
+                        fontSize = 10.sp,
+                    )
+                    Text(
+                        text = stringResource(R.string.student_profile_anamnese_answered_at, anamnese.date),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextSecondary,
+                        fontSize = 8.sp,
+                    )
+                }
+                if (index < anamneses.lastIndex) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TabCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+        Column(modifier = Modifier.padding(16.dp)) {
+            content()
         }
+    }
+}
+
+@Composable
+private fun EmptyTabMessage(text: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(88.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
     }
 }

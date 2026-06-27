@@ -1,5 +1,6 @@
 package com.labirintodosaber.data.remote
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -17,6 +18,11 @@ data class ApiErrorBody(
 
 @Serializable
 data class ValidationError(
+    // A API usa `field`; mantemos `path` como alternativa (formato documentado).
+    @SerialName("field") val fieldName: String? = null,
     val path: String? = null,
     val message: String? = null,
-)
+) {
+    /** Nome do campo independente de qual chave a API usou. */
+    val name: String? get() = fieldName ?: path
+}

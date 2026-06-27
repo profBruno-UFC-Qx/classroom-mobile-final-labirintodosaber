@@ -29,6 +29,7 @@ import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +39,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +75,14 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.registerSuccess) {
+        if (uiState.registerSuccess) {
+            onLoginClick()
+            viewModel.onAction(RegisterAction.OnRegisterHandled)
+        }
+    }
+
     RegisterContent(
         uiState = uiState,
         onAction = viewModel::onAction,
@@ -287,6 +297,17 @@ private fun RegisterForm(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
+        uiState.errorMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+            )
+        }
+
         // Botão Criar minha conta
         Box(
             modifier = Modifier
@@ -298,15 +319,23 @@ private fun RegisterForm(
                         colors = listOf(TealDark, TealLight),
                     ),
                 )
-                .clickable { onAction(RegisterAction.OnRegisterClick) },
+                .clickable(enabled = !uiState.isLoading) { onAction(RegisterAction.OnRegisterClick) },
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = stringResource(R.string.register_button),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-            )
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.register_button),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                )
+            }
         }
         Spacer(modifier = Modifier.height(20.dp))
 

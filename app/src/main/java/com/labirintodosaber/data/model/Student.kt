@@ -16,5 +16,16 @@ data class Student(
     val createdAt: String,
     val educatorId: String,
     val photoUrl: String? = null,
-    val educators: List<String> = emptyList(),
+    // A API devolve `educators` como array de objetos de educador (não de ids).
+    val educators: List<EducatorSummary> = emptyList(),
+)
+
+/** Educador vinculado, conforme aninhado na resposta de [Student]. */
+@Serializable
+data class EducatorSummary(
+    val id: String? = null,
+    val name: String? = null,
+    val email: String? = null,
+    val photoUrl: String? = null,
+    val contact: String? = null,
 )

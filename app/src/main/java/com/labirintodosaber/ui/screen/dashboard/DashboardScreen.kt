@@ -174,15 +174,24 @@ private fun DashboardContent(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(uiState.todaySessions) { session ->
-                    SessionCard(
-                        session = session,
-                        onClick = { onAction(DashboardAction.OnSessionClick(session.id)) },
-                    )
+            if (uiState.todaySessions.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.dashboard_no_sessions_today),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            } else {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(uiState.todaySessions) { session ->
+                        SessionCard(
+                            session = session,
+                            onClick = { onAction(DashboardAction.OnSessionClick(session.id)) },
+                        )
+                    }
                 }
             }
 
@@ -364,8 +373,8 @@ private fun PastSessionsCard(
     pastSessions: List<PastSessionItem>,
     activities: List<ActivityItem>,
     onSeeAll: () -> Unit,
-    onPastSessionClick: (Int) -> Unit,
-    onActivityClick: (Int) -> Unit,
+    onPastSessionClick: (String) -> Unit,
+    onActivityClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -397,13 +406,21 @@ private fun PastSessionsCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            pastSessions.forEachIndexed { index, session ->
-                PastSessionRow(
-                    session = session,
-                    onClick = { onPastSessionClick(session.id) },
+            if (pastSessions.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.dashboard_no_recent_sessions),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
                 )
-                if (index < pastSessions.lastIndex) {
-                    Spacer(modifier = Modifier.height(8.dp))
+            } else {
+                pastSessions.forEachIndexed { index, session ->
+                    PastSessionRow(
+                        session = session,
+                        onClick = { onPastSessionClick(session.id) },
+                    )
+                    if (index < pastSessions.lastIndex) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
 

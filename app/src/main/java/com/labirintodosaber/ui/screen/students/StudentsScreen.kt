@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.InputBackground
@@ -68,7 +71,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun StudentsScreen(
-    onStudentClick: (Int) -> Unit,
+    onStudentClick: (String) -> Unit,
     onAddStudentClick: () -> Unit,
     onHomeClick: () -> Unit,
     onActivitiesClick: () -> Unit = {},
@@ -92,7 +95,7 @@ fun StudentsScreen(
 private fun StudentsContent(
     uiState: StudentsUiState,
     onAction: (StudentsAction) -> Unit,
-    onStudentClick: (Int) -> Unit,
+    onStudentClick: (String) -> Unit,
     onAddStudentClick: () -> Unit,
     onHomeClick: () -> Unit,
     onActivitiesClick: () -> Unit,
@@ -113,8 +116,12 @@ private fun StudentsContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: drawer */ }) {
-                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
+                    IconButton(onClick = onHomeClick) {
+                        Icon(
+                            Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = stringResource(R.string.students_back_desc),
+                            tint = TextPrimary,
+                        )
                     }
                 },
                 actions = {
@@ -192,11 +199,43 @@ private fun StudentsContent(
                 )
             }
 
-            items(filtered) { student ->
-                StudentCard(
-                    student = student,
-                    onClick = { onStudentClick(student.id) },
-                )
+            when {
+                uiState.isLoading -> item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(color = TealPrimary)
+                    }
+                }
+
+                uiState.errorMessage != null -> item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = uiState.errorMessage,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextSecondary,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.students_retry),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = TealPrimary,
+                            modifier = Modifier.clickable { onAction(StudentsAction.OnRetry) },
+                        )
+                    }
+                }
+
+                else -> items(filtered) { student ->
+                    StudentCard(
+                        student = student,
+                        onClick = { onStudentClick(student.id) },
+                    )
+                }
             }
 
             item { Spacer(modifier = Modifier.height(8.dp)) }
@@ -222,18 +261,33 @@ private fun StudentCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val genericAvatar = painterResource(
+                    if (student.isGirl) R.drawable.girl_home else R.drawable.boy_home,
+                )
                 Box(
                     modifier = Modifier
                         .size(46.dp)
                         .border(2.dp, borderColor, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Image(
-                        painter = painterResource(if (student.isGirl) R.drawable.girl_home else R.drawable.boy_home),
-                        contentDescription = stringResource(R.string.students_avatar_desc),
-                        modifier = Modifier.size(42.dp).clip(CircleShape),
-                        contentScale = ContentScale.Crop,
-                    )
+                    if (student.photoUrl != null) {
+                        AsyncImage(
+                            model = student.photoUrl,
+                            contentDescription = stringResource(R.string.students_avatar_desc),
+                            placeholder = genericAvatar,
+                            error = genericAvatar,
+                            fallback = genericAvatar,
+                            modifier = Modifier.size(42.dp).clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                        )
+                    } else {
+                        Image(
+                            painter = genericAvatar,
+                            contentDescription = stringResource(R.string.students_avatar_desc),
+                            modifier = Modifier.size(42.dp).clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {

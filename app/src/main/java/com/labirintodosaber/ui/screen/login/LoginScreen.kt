@@ -31,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +42,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,10 +80,17 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.loginSuccess) {
+        if (uiState.loginSuccess) {
+            onLoginSuccess()
+            viewModel.onAction(LoginAction.OnLoginHandled)
+        }
+    }
+
     LoginContent(
         uiState = uiState,
         onAction = viewModel::onAction,
-        onLoginSuccess = onLoginSuccess,
         onRegisterClick = onRegisterClick,
         onForgotPasswordClick = onForgotPasswordClick,
         modifier = modifier,
@@ -92,7 +101,6 @@ fun LoginScreen(
 private fun LoginContent(
     uiState: LoginUiState,
     onAction: (LoginAction) -> Unit,
-    onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -132,7 +140,7 @@ private fun LoginContent(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             ) {
-                LoginForm(uiState = uiState, onAction = onAction, onLoginSuccess = onLoginSuccess, onRegisterClick = onRegisterClick, onForgotPasswordClick = onForgotPasswordClick)
+                LoginForm(uiState = uiState, onAction = onAction, onRegisterClick = onRegisterClick, onForgotPasswordClick = onForgotPasswordClick)
             }
 
             Spacer(modifier = Modifier.height(36.dp))
@@ -144,7 +152,6 @@ private fun LoginContent(
 private fun LoginForm(
     uiState: LoginUiState,
     onAction: (LoginAction) -> Unit,
-    onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
 ) {
@@ -288,6 +295,17 @@ private fun LoginForm(
         }
         Spacer(modifier = Modifier.height(24.dp))
 
+        uiState.errorMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+            )
+        }
+
         // Botão Entrar agora (gradiente)
         Box(
             modifier = Modifier
@@ -299,15 +317,23 @@ private fun LoginForm(
                         colors = listOf(TealDark, TealLight),
                     ),
                 )
-                .clickable { onLoginSuccess() },
+                .clickable(enabled = !uiState.isLoading) { onAction(LoginAction.OnLoginClick) },
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = stringResource(R.string.login_button),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-            )
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.login_button),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                )
+            }
         }
         Spacer(modifier = Modifier.height(20.dp))
 

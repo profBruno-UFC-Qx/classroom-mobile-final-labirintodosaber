@@ -79,6 +79,8 @@
     <string name="students_count_label">Alunos organizados em ordem alfabética (%1$d alunos)</string>
     <string name="students_progress_label">Progresso Geral</string>
     <string name="students_avatar_desc">Foto do aluno</string>
+    <string name="students_retry">Tentar novamente</string>
+    <string name="students_back_desc">Voltar</string>
 
     <!-- Add Student -->
     <string name="add_student_photo_button">Adicionar foto</string>
@@ -91,6 +93,8 @@
     <string name="add_student_gender_placeholder">Selecione</string>
     <string name="add_student_phone_label">Contato do Responsável</string>
     <string name="add_student_phone_placeholder">(00) 00000-0000</string>
+    <string name="add_student_topics_label">Temas de Aprendizagem</string>
+    <string name="add_student_topics_placeholder">Ex: Leitura, Escrita, Vocabulário</string>
     <string name="add_student_address_section">Endereço</string>
     <string name="add_student_cep_label">CEP</string>
     <string name="add_student_cep_placeholder">00000-000</string>
@@ -117,6 +121,12 @@
     <string name="student_profile_tab_documents">Documentos</string>
     <string name="student_profile_tab_anamnese">Anamnese</string>
     <string name="student_profile_progress_category_title">Progresso por Categoria</string>
+    <string name="student_profile_sessions_empty">Nenhuma sessão registrada para este aluno.</string>
+    <string name="student_profile_documents_empty">Nenhum relatório gerado ainda.</string>
+    <string name="student_profile_anamnese_empty">Nenhuma anamnese respondida.</string>
+    <string name="student_profile_session_finished">%1$s • %2$d questões</string>
+    <string name="student_profile_session_ongoing">%1$s • em andamento</string>
+    <string name="student_profile_anamnese_answered_at">Respondida em %1$s</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">Tela Inicial</string>
@@ -125,6 +135,8 @@
     <string name="dashboard_start_session">Iniciar Sessão</string>
     <string name="dashboard_today_sessions">Sessões de hoje</string>
     <string name="dashboard_recent_sessions">Últimas Sessões Realizadas</string>
+    <string name="dashboard_no_sessions_today">Nenhuma sessão registrada hoje.</string>
+    <string name="dashboard_no_recent_sessions">Nenhuma sessão realizada ainda.</string>
     <string name="dashboard_see_all">Ver todas →</string>
     <string name="dashboard_recent_activities">Atividades Recentes</string>
     <string name="dashboard_hit_rate_label">Taxa de Acerto</string>

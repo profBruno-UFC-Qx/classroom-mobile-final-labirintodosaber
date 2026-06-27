@@ -28,6 +28,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +44,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +75,14 @@ fun AddStudentScreen(
     viewModel: AddStudentViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.saveSuccess) {
+        if (uiState.saveSuccess) {
+            onSaveSuccess()
+            viewModel.onAction(AddStudentAction.OnSaveHandled)
+        }
+    }
+
     AddStudentContent(
         uiState = uiState,
         onAction = viewModel::onAction,
@@ -167,6 +177,16 @@ private fun AddStudentContent(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    FormField(label = stringResource(R.string.add_student_topics_label), required = true) {
+                        FormTextField(
+                            value = uiState.learningTopics,
+                            onValueChange = { onAction(AddStudentAction.OnLearningTopicsChange(it)) },
+                            placeholder = stringResource(R.string.add_student_topics_placeholder),
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(16.dp))
                     HorizontalDivider(color = InputBorder)
                     Spacer(modifier = Modifier.height(16.dp))
@@ -232,6 +252,17 @@ private fun AddStudentContent(
                 )
             }
 
+            uiState.errorMessage?.let { message ->
+                item {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -251,19 +282,28 @@ private fun AddStudentContent(
                     }
                     Button(
                         onClick = { onAction(AddStudentAction.OnSaveClick) },
+                        enabled = !uiState.isLoading,
                         modifier = Modifier.weight(0.6f).height(48.dp),
                         shape = RoundedCornerShape(50.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = TealPrimary),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     ) {
-                        Icon(Icons.Outlined.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = stringResource(R.string.add_student_save),
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            fontSize = 12.sp,
-                        )
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Icon(Icons.Outlined.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(R.string.add_student_save),
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                fontSize = 12.sp,
+                            )
+                        }
                     }
                 }
             }

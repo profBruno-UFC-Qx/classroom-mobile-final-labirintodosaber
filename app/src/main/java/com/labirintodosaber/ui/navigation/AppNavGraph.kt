@@ -81,7 +81,7 @@ fun AppNavGraph(
         }
         composable(
             route = AppDestination.StudentProfile.route,
-            arguments = listOf(navArgument("studentId") { type = NavType.IntType }),
+            arguments = listOf(navArgument("studentId") { type = NavType.StringType }),
         ) {
             StudentProfileScreen(
                 onBackClick = { navController.popBackStack() },
@@ -162,7 +162,7 @@ sealed class AppDestination(val route: String) {
     data object Students : AppDestination("students")
     data object AddStudent : AppDestination("add-student")
     data object StudentProfile : AppDestination("student-profile/{studentId}") {
-        fun createRoute(studentId: Int) = "student-profile/$studentId"
+        fun createRoute(studentId: String) = "student-profile/$studentId"
     }
     data object Activities : AppDestination("activities")
     data object CreateActivity : AppDestination("create-activity")

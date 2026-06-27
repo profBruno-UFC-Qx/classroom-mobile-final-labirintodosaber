@@ -47,14 +47,18 @@ class ApiCaller @Inject constructor(
             in 500..599 -> ApiErrorType.SERVER
             else -> ApiErrorType.UNKNOWN
         }
-        val message = body?.message
-            ?: body?.error
-            ?: defaultMessage(type)
+        val validationErrors = body?.errors ?: emptyList()
+        val message = when {
+            validationErrors.isNotEmpty() -> validationErrors.joinToString("\n") { e ->
+                listOfNotNull(e.name, e.message).joinToString(": ")
+            }
+            else -> body?.message ?: body?.error ?: defaultMessage(type)
+        }
         return ApiResult.Error(
             type = type,
             message = message,
             httpCode = code,
-            validationErrors = body?.errors ?: emptyList(),
+            validationErrors = validationErrors,
         )
     }
 
