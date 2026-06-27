@@ -86,6 +86,8 @@ fun ActivitiesScreen(
     onNotebookClick: (String) -> Unit,
     onGroupClick: (String) -> Unit,
     onTaskClick: (String) -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ActivitiesViewModel = hiltViewModel(),
 ) {
@@ -109,6 +111,8 @@ fun ActivitiesScreen(
         onNotebookClick = onNotebookClick,
         onGroupClick = onGroupClick,
         onTaskClick = onTaskClick,
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -127,6 +131,8 @@ private fun ActivitiesContent(
     onNotebookClick: (String) -> Unit,
     onGroupClick: (String) -> Unit,
     onTaskClick: (String) -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var showCreateMenu by remember { mutableStateOf(false) }
@@ -154,12 +160,12 @@ private fun ActivitiesContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onMenuClick) {
                         Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onProfileClick) {
                         Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.dashboard_profile_desc), tint = TextPrimary, modifier = Modifier.size(28.dp))
                     }
                 },

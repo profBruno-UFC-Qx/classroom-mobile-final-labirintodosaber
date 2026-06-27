@@ -81,12 +81,15 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun DashboardScreen(
     onStudentsClick: () -> Unit = {},
     onActivitiesClick: () -> Unit = {},
+    onReportsClick: () -> Unit = {},
+    onStartSessionClick: () -> Unit = {},
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Recarrega ao entrar e ao retomar a tela (ex.: após cadastrar aluno).
     LifecycleResumeEffect(Unit) {
         viewModel.refresh()
         onPauseOrDispose { }
@@ -97,6 +100,10 @@ fun DashboardScreen(
         onAction = viewModel::onAction,
         onStudentsClick = onStudentsClick,
         onActivitiesClick = onActivitiesClick,
+        onReportsClick = onReportsClick,
+        onStartSessionClick = onStartSessionClick,
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -108,6 +115,10 @@ private fun DashboardContent(
     onAction: (DashboardAction) -> Unit,
     onStudentsClick: () -> Unit,
     onActivitiesClick: () -> Unit,
+    onReportsClick: () -> Unit = {},
+    onStartSessionClick: () -> Unit = {},
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -122,7 +133,7 @@ private fun DashboardContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: abrir drawer */ }) {
+                    IconButton(onClick = onMenuClick) {
                         Icon(
                             imageVector = Icons.Outlined.Menu,
                             contentDescription = stringResource(R.string.dashboard_menu_desc),
@@ -131,7 +142,7 @@ private fun DashboardContent(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: abrir perfil */ }) {
+                    IconButton(onClick = onProfileClick) {
                         Icon(
                             imageVector = Icons.Outlined.AccountCircle,
                             contentDescription = stringResource(R.string.dashboard_profile_desc),
@@ -151,6 +162,7 @@ private fun DashboardContent(
                 onTabSelect = { onAction(DashboardAction.OnTabSelect(it)) },
                 onStudentsClick = onStudentsClick,
                 onActivitiesClick = onActivitiesClick,
+                onReportsClick = onReportsClick,
             )
         },
         containerColor = Color.White,
@@ -166,7 +178,7 @@ private fun DashboardContent(
             WelcomeBanner(
                 userName = uiState.userName,
                 sessionCount = uiState.todaySessionCount,
-                onStartSession = { onAction(DashboardAction.OnStartSession) },
+                onStartSession = onStartSessionClick,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
 
@@ -652,6 +664,7 @@ private fun DashboardBottomBar(
     onTabSelect: (DashboardTab) -> Unit,
     onStudentsClick: () -> Unit,
     onActivitiesClick: () -> Unit,
+    onReportsClick: () -> Unit = {},
 ) {
     data class TabItem(val tab: DashboardTab, val label: Int, val icon: ImageVector, val iconFilled: ImageVector)
 
@@ -674,6 +687,7 @@ private fun DashboardBottomBar(
                     when (item.tab) {
                         DashboardTab.STUDENTS -> onStudentsClick()
                         DashboardTab.ACTIVITIES -> onActivitiesClick()
+                        DashboardTab.REPORTS -> onReportsClick()
                         else -> onTabSelect(item.tab)
                     }
                 },

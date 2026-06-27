@@ -21,8 +21,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Home
@@ -76,6 +77,9 @@ fun StudentsScreen(
     onAddStudentClick: () -> Unit,
     onHomeClick: () -> Unit,
     onActivitiesClick: () -> Unit = {},
+    onReportsClick: () -> Unit = {},
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: StudentsViewModel = hiltViewModel(),
 ) {
@@ -94,6 +98,9 @@ fun StudentsScreen(
         onAddStudentClick = onAddStudentClick,
         onHomeClick = onHomeClick,
         onActivitiesClick = onActivitiesClick,
+        onReportsClick = onReportsClick,
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -107,6 +114,9 @@ private fun StudentsContent(
     onAddStudentClick: () -> Unit,
     onHomeClick: () -> Unit,
     onActivitiesClick: () -> Unit,
+    onReportsClick: () -> Unit = {},
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val filtered = if (uiState.searchQuery.isBlank()) uiState.students
@@ -124,16 +134,16 @@ private fun StudentsContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onHomeClick) {
+                    IconButton(onClick = onMenuClick) {
                         Icon(
-                            Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.students_back_desc),
+                            Icons.Outlined.Menu,
+                            contentDescription = stringResource(R.string.dashboard_menu_desc),
                             tint = TextPrimary,
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: perfil */ }) {
+                    IconButton(onClick = onProfileClick) {
                         Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.dashboard_profile_desc), tint = TextPrimary, modifier = Modifier.size(28.dp))
                     }
                 },
@@ -141,7 +151,7 @@ private fun StudentsContent(
             )
         },
         bottomBar = {
-            StudentsBottomBar(onHomeClick = onHomeClick, onActivitiesClick = onActivitiesClick)
+            StudentsBottomBar(onHomeClick = onHomeClick, onActivitiesClick = onActivitiesClick, onReportsClick = onReportsClick)
         },
         containerColor = Color.White,
     ) { padding ->
@@ -372,6 +382,7 @@ private fun StudentProgressBar(
 private fun StudentsBottomBar(
     onHomeClick: () -> Unit,
     onActivitiesClick: () -> Unit,
+    onReportsClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     NavigationBar(
@@ -395,7 +406,7 @@ private fun StudentsBottomBar(
         NavigationBarItem(
             selected = false,
             onClick = onActivitiesClick,
-            icon = { Icon(Icons.Outlined.Menu, contentDescription = null) },
+            icon = { Icon(Icons.AutoMirrored.Outlined.MenuBook, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_activities), style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(
                 unselectedIconColor = TextSecondary,
@@ -406,7 +417,7 @@ private fun StudentsBottomBar(
         NavigationBarItem(
             selected = true,
             onClick = { /* já estamos aqui */ },
-            icon = { Icon(Icons.Filled.Home, contentDescription = null) },
+            icon = { Icon(Icons.Filled.Person, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_students), style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = TealPrimary,
@@ -418,8 +429,8 @@ private fun StudentsBottomBar(
         )
         NavigationBarItem(
             selected = false,
-            onClick = { /* TODO */ },
-            icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+            onClick = onReportsClick,
+            icon = { Icon(Icons.AutoMirrored.Outlined.Assignment, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_reports), style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(
                 unselectedIconColor = TextSecondary,

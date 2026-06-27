@@ -197,4 +197,78 @@
 
     <!-- Back button (shared) -->
     <string name="back_button">Voltar</string>
+
+    <!-- Session Flow -->
+    <string name="session_topbar_title">Sessão</string>
+    <string name="session_select_student_hint">Escolha o aluno que participará desta sessão</string>
+    <string name="session_search_student_placeholder">Buscar Aluno...</string>
+    <string name="session_next_step_button">Próximo Passo</string>
+    <string name="session_back_button">Voltar</string>
+    <string name="session_name_label">Dê um nome à sessão</string>
+    <string name="session_name_placeholder">Ex: Sessão de Alfabetização - 08/04/2026</string>
+    <string name="session_content_hint">Como gostaria de começar?</string>
+    <string name="session_search_content_placeholder">Buscar caderno por nome...</string>
+    <string name="session_filter_all">Ver Tudo</string>
+    <string name="session_filter_notebooks">Cadernos</string>
+    <string name="session_filter_groups">Grupos</string>
+    <string name="session_filter_activities">Atividades</string>
+    <string name="session_start_button">Iniciar Sessão Agora</string>
+    <string name="session_confirm_answer_button">Confirmar Resposta</string>
+    <string name="session_correct_title">Muito bem!</string>
+    <string name="session_correct_body">Você acertou! Continue assim!</string>
+    <string name="session_wrong_title">Ops! Tente novamente</string>
+    <string name="session_wrong_body">Não foi dessa vez, mas você está aprendendo!</string>
+    <string name="session_next_activity_button">Próxima Atividade</string>
+    <string name="session_retry_button">Refazer</string>
+    <string name="session_menu_desc">Menu de navegação</string>
+    <string name="session_profile_desc">Perfil do usuário</string>
+    <string name="session_student_avatar_desc">Avatar do aluno</string>
+    <string name="session_audio_play_desc">Reproduzir áudio</string>
+    <string name="session_zoom_image_desc">Ampliar imagem</string>
+    <string name="session_timer_pause_desc">Pausar cronômetro</string>
+    <string name="session_timer_resume_desc">Retomar cronômetro</string>
+    <string name="session_finished">Sessão concluída!</string>
+    <string name="session_finished_body">Todas as atividades foram respondidas.</string>
+    <string name="session_finish_button">Finalizar Sessão</string>
+
+    <!-- Reports -->
+    <string name="reports_title">Relatórios</string>
+    <string name="reports_step_student">Buscar Aluno</string>
+    <string name="reports_student_placeholder">Buscar aluno por nome...</string>
+    <string name="reports_step_period">Período</string>
+    <string name="reports_period_3_months">Últimos 3 meses</string>
+    <string name="reports_period_6_months">Últimos 6 meses</string>
+    <string name="reports_period_all">Todas as sessões</string>
+    <string name="reports_period_custom">Período Personalizado</string>
+    <string name="reports_session_preview_title">Prévia das Sessões Incluídas</string>
+    <string name="reports_content_title">Conteúdo do Relatório</string>
+    <string name="reports_content_metrics">Métricas de Desempenho</string>
+    <string name="reports_content_metrics_desc">Gráficos, porcentagem de acertos e estatísticas gerais</string>
+    <string name="reports_content_qualitative">Observações Qualitativas</string>
+    <string name="reports_content_qualitative_desc">Comentários e observações das sessões</string>
+    <string name="reports_content_anamnese">Dados da Anamnese</string>
+    <string name="reports_content_anamnese_desc">Resumo de dados médicos e de desenvolvimento do aluno</string>
+    <string name="reports_export_button">Exportar Relatório em PDF</string>
+    <string name="reports_export_subtitle">Relatório de %1$s</string>
+    <string name="reports_export_no_student">aluno não selecionado</string>
+    <string name="reports_date_picker_title">Selecione o período</string>
+    <string name="reports_date_confirm">Confirmar</string>
+    <string name="reports_date_cancel">Cancelar</string>
+
+    <!-- Session Report -->
+    <string name="session_report_student">Aluno</string>
+    <string name="session_report_date">Data</string>
+    <string name="session_report_professional">Profissional</string>
+    <string name="session_report_total_questions">Total de Questões</string>
+    <string name="session_report_questions_count">%1$d questões</string>
+    <string name="session_report_time_title">Relação de Tempos</string>
+    <string name="session_report_total_time">Tempo Total</string>
+    <string name="session_report_avg_response">Tempo Médio de Resposta</string>
+    <string name="session_report_avg_correct">Tempo Médio p/ Acerto</string>
+    <string name="session_report_avg_wrong">Tempo Médio p/ Erro</string>
+    <string name="session_report_category_title">Taxa de Acerto por Categoria</string>
+    <string name="session_report_type_title">Taxa de Acerto por Tipo de Atividade</string>
+    <string name="session_report_descriptive_title">Relatório Descritivo</string>
+    <string name="session_report_char_count">%1$d caracteres</string>
+    <string name="session_report_descriptive_placeholder">Adicione observações detalhadas sobre o desempenho do aluno durante a sessão…</string>
 </resources>
