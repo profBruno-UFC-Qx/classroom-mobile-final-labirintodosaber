@@ -30,9 +30,11 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +52,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,10 +90,18 @@ fun ReportsScreen(
     onStudentsClick: () -> Unit = {},
     onMenuClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
+    onPdfGenerated: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ReportsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.generatedPdfPath) {
+        uiState.generatedPdfPath?.let {
+            onPdfGenerated(it)
+            viewModel.onAction(ReportsAction.OnPdfOpened)
+        }
+    }
 
     ReportsContent(
         uiState = uiState,
@@ -376,36 +387,63 @@ private fun ReportsContent(
                         else
                             Brush.horizontalGradient(listOf(Color(0xFFB0B0B0), Color(0xFFD0D0D0)))
                     )
-                    .clickable(enabled = uiState.canExport) { onAction(ReportsAction.OnExportPdf) },
+                    .clickable(enabled = uiState.canExport && !uiState.isExporting) {
+                        onAction(ReportsAction.OnExportPdf)
+                    },
                 contentAlignment = Alignment.Center,
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Outlined.Download,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
+                if (uiState.isExporting) {
+                    CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Outlined.Download,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = stringResource(R.string.reports_export_button),
+                                color = Color.White,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                         Text(
-                            text = stringResource(R.string.reports_export_button),
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold,
+                            text = stringResource(R.string.reports_export_subtitle, studentLabel),
+                            color = Color.White.copy(alpha = 0.8f),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontSize = 10.sp,
                         )
                     }
-                    Text(
-                        text = stringResource(R.string.reports_export_subtitle, studentLabel),
-                        color = Color.White.copy(alpha = 0.8f),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontSize = 10.sp,
-                    )
                 }
+            }
+
+            uiState.exportError?.let { error ->
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFFDC2626),
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+
+    if (uiState.showNoSessions) {
+        AlertDialog(
+            onDismissRequest = { onAction(ReportsAction.OnDismissNoSessions) },
+            confirmButton = {
+                TextButton(onClick = { onAction(ReportsAction.OnDismissNoSessions) }) {
+                    Text(stringResource(R.string.reports_no_sessions_dismiss))
+                }
+            },
+            title = { Text(stringResource(R.string.reports_no_sessions_title)) },
+            text = { Text(stringResource(R.string.reports_no_sessions_message)) },
+        )
     }
 }
 

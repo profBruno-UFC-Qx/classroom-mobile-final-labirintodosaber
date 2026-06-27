@@ -218,6 +218,11 @@ fun AppNavGraph(
                     onStudentsClick = { navController.navigate(AppDestination.Students.route) },
                     onMenuClick = onMenuClick,
                     onProfileClick = onProfileClick,
+                    onPdfGenerated = { path ->
+                        navController.navigate(AppDestination.ReportPdf.createRoute(path)) {
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
             composable(AppDestination.Students.route) {

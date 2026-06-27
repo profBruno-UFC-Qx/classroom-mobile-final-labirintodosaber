@@ -236,6 +236,9 @@
     <string name="reports_step_student">Buscar Aluno</string>
     <string name="reports_student_placeholder">Buscar aluno por nome...</string>
     <string name="reports_no_students">Nenhum aluno encontrado.</string>
+    <string name="reports_no_sessions_title">Nenhuma sessão encontrada</string>
+    <string name="reports_no_sessions_message">Não há sessões para o aluno no período selecionado.</string>
+    <string name="reports_no_sessions_dismiss">Entendi</string>
     <string name="reports_step_period">Período</string>
     <string name="reports_period_3_months">Últimos 3 meses</string>
     <string name="reports_period_6_months">Últimos 6 meses</string>
