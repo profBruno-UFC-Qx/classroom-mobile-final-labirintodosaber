@@ -49,8 +49,10 @@ import com.labirintodosaber.ui.screen.sessionselectstudent.SessionSelectStudentS
 import com.labirintodosaber.ui.screen.studentprofile.StudentProfileScreen
 import com.labirintodosaber.ui.screen.students.StudentsScreen
 import com.labirintodosaber.ui.screen.support.SupportScreen
+import com.labirintodosaber.ui.screen.userprofile.UserProfileAction
 import com.labirintodosaber.ui.screen.userprofile.UserProfileScreen
 import com.labirintodosaber.ui.screen.userprofile.UserProfileViewModel
+import com.labirintodosaber.ui.theme.LabirintodoSaberTheme
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -77,6 +79,21 @@ fun AppNavGraph(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
+
+    val authRoutes = setOf(
+        AppDestination.Login.route,
+        AppDestination.Register.route,
+        AppDestination.ForgotPassword.route,
+    )
+
+    // Redireciona para login sempre que o token sumir (logout manual ou 401 do interceptor).
+    LaunchedEffect(isAuthenticated) {
+        if (isAuthenticated == false && currentRoute !in authRoutes) {
+            navController.navigate(AppDestination.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     // Routes where the drawer / profile sheet are accessible
     val mainRoutes = setOf(
@@ -108,6 +125,8 @@ fun AppNavGraph(
                 currentRoute = currentRoute,
                 userName = profileUiState.name,
                 userEmail = profileUiState.email,
+                isDarkTheme = profileUiState.isDarkTheme,
+                onToggleTheme = { profileViewModel.onAction(UserProfileAction.OnToggleDarkTheme) },
                 onNavigate = { route ->
                     scope.launch { drawerState.close() }
                     if (currentRoute != route) {
@@ -127,15 +146,17 @@ fun AppNavGraph(
             startDestination = startDestination,
         ) {
             composable(AppDestination.Login.route) {
-                LoginScreen(
-                    onLoginSuccess = {
-                        navController.navigate(AppDestination.Dashboard.route) {
-                            popUpTo(AppDestination.Login.route) { inclusive = true }
-                        }
-                    },
-                    onRegisterClick = { navController.navigate(AppDestination.Register.route) },
-                    onForgotPasswordClick = { navController.navigate(AppDestination.ForgotPassword.route) },
-                )
+                LabirintodoSaberTheme(darkTheme = false) {
+                    LoginScreen(
+                        onLoginSuccess = {
+                            navController.navigate(AppDestination.Dashboard.route) {
+                                popUpTo(AppDestination.Login.route) { inclusive = true }
+                            }
+                        },
+                        onRegisterClick = { navController.navigate(AppDestination.Register.route) },
+                        onForgotPasswordClick = { navController.navigate(AppDestination.ForgotPassword.route) },
+                    )
+                }
             }
             composable(AppDestination.Register.route) {
                 RegisterScreen(
@@ -144,7 +165,9 @@ fun AppNavGraph(
                 )
             }
             composable(AppDestination.ForgotPassword.route) {
-                ForgotPasswordScreen(onBackClick = { navController.popBackStack() })
+                LabirintodoSaberTheme(darkTheme = false) {
+                    ForgotPasswordScreen(onBackClick = { navController.popBackStack() })
+                }
             }
             composable(AppDestination.Dashboard.route) {
                 DashboardScreen(
@@ -439,9 +462,7 @@ fun AppNavGraph(
                 },
                 onLogout = {
                     showProfileSheet = false
-                    navController.navigate(AppDestination.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
+                    scope.launch { profileViewModel.signOut() }
                 },
             )
         }

@@ -255,7 +255,7 @@ private fun SessionReportContent(
                             .fillMaxWidth()
                             .height(8.dp)
                             .clip(RoundedCornerShape(50.dp))
-                            .background(Color(0xFFE5E7EB)),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                     ) {
                         Box(
                             modifier = Modifier
@@ -294,7 +294,7 @@ private fun SessionReportContent(
                                         .fillMaxWidth()
                                         .height(36.dp)
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(Color(0xFFCBEAE6)),
+                                        .background(MaterialTheme.colorScheme.primaryContainer),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
@@ -413,7 +413,7 @@ private fun ReportCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

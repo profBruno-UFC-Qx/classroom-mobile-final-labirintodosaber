@@ -73,7 +73,6 @@ import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.data.remote.FileUpload
 import com.labirintodosaber.ui.components.ProfileActionIcon
-import com.labirintodosaber.ui.theme.GradientBottom
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
 
@@ -142,7 +141,7 @@ private fun AddStudentContent(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
-        containerColor = GradientBottom,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -350,7 +349,7 @@ private fun PhotoSection(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = GradientBottom,
+        color = MaterialTheme.colorScheme.surface,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp),
@@ -489,7 +488,7 @@ private fun FormCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = GradientBottom,
+        color = MaterialTheme.colorScheme.surface,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             content()

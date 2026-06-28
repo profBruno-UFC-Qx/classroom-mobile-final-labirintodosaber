@@ -33,7 +33,11 @@ class AuthInterceptor @Inject constructor(
                 .header("Authorization", "Bearer $token")
                 .build()
         }
-        return chain.proceed(request)
+        val response = chain.proceed(request)
+        if (response.code == 401) {
+            kotlinx.coroutines.runBlocking { tokenStore.clearToken() }
+        }
+        return response
     }
 
     companion object {

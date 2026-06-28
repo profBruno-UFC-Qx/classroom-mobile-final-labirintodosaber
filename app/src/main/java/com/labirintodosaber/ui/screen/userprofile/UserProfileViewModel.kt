@@ -57,6 +57,10 @@ class UserProfileViewModel @Inject constructor(
 
     fun refresh() = load()
 
+    fun signOut() {
+        viewModelScope.launch { authRepository.signOut() }
+    }
+
     private fun load() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }

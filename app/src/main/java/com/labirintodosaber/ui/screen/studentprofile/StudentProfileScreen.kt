@@ -54,7 +54,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
-import com.labirintodosaber.ui.theme.GradientBottom
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
@@ -114,7 +113,7 @@ private fun StudentProfileContent(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
-        containerColor = GradientBottom,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -212,8 +211,6 @@ private fun StudentInfoCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    InfoRow(label = stringResource(R.string.student_profile_birth_date_label), value = uiState.birthDate)
-                    Spacer(modifier = Modifier.height(4.dp))
                     InfoRow(label = stringResource(R.string.student_profile_address_label), value = uiState.address)
                     Spacer(modifier = Modifier.height(4.dp))
                     InfoRow(label = stringResource(R.string.student_profile_objective_label), value = uiState.objective)
@@ -372,7 +369,7 @@ private fun CategoryProgressRow(
                 .fillMaxWidth()
                 .height(7.dp)
                 .clip(RoundedCornerShape(50.dp))
-                .background(Color(0xFFF3F4F6)),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
         ) {
             Box(
                 modifier = Modifier
