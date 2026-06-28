@@ -60,6 +60,7 @@
     <string name="forgot_send_button">Enviar Código</string>
     <!-- Step 2 -->
     <string name="forgot_step2_sent_to">Enviamos um código para</string>
+    <string name="forgot_code_placeholder">Digite o código recebido</string>
     <string name="forgot_verify_button">Verificar Código</string>
     <string name="forgot_resend_prompt">Não recebeu o código?</string>
     <string name="forgot_resend_link"> Reenviar</string>

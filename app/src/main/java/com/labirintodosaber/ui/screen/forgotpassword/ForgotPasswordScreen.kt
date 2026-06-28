@@ -56,6 +56,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
@@ -587,61 +588,31 @@ private fun OtpInput(
     onCodeChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        // Boxes visuais
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            repeat(6) { index ->
-                val isCurrent = index == code.length
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .aspectRatio(1f)
-                        .background(InputBackground, RoundedCornerShape(8.dp))
-                        .then(
-                            Modifier.clip(RoundedCornerShape(8.dp))
-                        )
-                        .padding(1.dp)
-                        .background(
-                            if (isCurrent) TealPrimary.copy(alpha = 0.12f) else Color.Transparent,
-                            RoundedCornerShape(7.dp),
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    // Border drawn separately
-                    androidx.compose.foundation.Canvas(modifier = Modifier.matchParentSize()) {
-                        val strokeWidth = if (isCurrent) 1.5.dp.toPx() else 1.dp.toPx()
-                        val color = if (isCurrent) TealPrimary else InputBorder
-                        drawRoundRect(
-                            color = color,
-                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(8.dp.toPx()),
-                            style = androidx.compose.ui.graphics.drawscope.Stroke(strokeWidth),
-                        )
-                    }
-                    Text(
-                        text = code.getOrNull(index)?.toString() ?: "",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                    )
-                }
-            }
-        }
-
-        // Campo invisível que captura o teclado
-        BasicTextField(
-            value = code,
-            onValueChange = { new ->
-                onCodeChange(new.filter { it.isDigit() }.take(6))
-            },
-            modifier = Modifier
-                .matchParentSize()
-                .alpha(0f),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-        )
-    }
+    OutlinedTextField(
+        value = code,
+        onValueChange = { onCodeChange(it.filter { c -> c.isLetterOrDigit() }.take(12)) },
+        modifier = modifier.fillMaxWidth(),
+        placeholder = {
+            Text(
+                text = stringResource(R.string.forgot_code_placeholder),
+                color = TextSecondary,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        },
+        singleLine = true,
+        textStyle = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 4.sp,
+        ),
+        shape = RoundedCornerShape(12.dp),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = TealPrimary,
+            unfocusedBorderColor = InputBorder,
+            focusedContainerColor = InputBackground,
+            unfocusedContainerColor = InputBackground,
+        ),
+    )
 }
 
 @Composable

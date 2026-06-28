@@ -25,7 +25,8 @@ class ForgotPasswordViewModel @Inject constructor(
             is ForgotPasswordAction.OnEmailChange -> _uiState.update { it.copy(email = action.email, errorMessage = null) }
             ForgotPasswordAction.OnSendCodeClick -> sendCode()
             is ForgotPasswordAction.OnCodeChange -> _uiState.update {
-                it.copy(code = action.code.filter { c -> c.isDigit() }.take(6))
+                // O token de recuperação é alfanumérico (letras e números).
+                it.copy(code = action.code.filter { c -> c.isLetterOrDigit() }.take(12))
             }
             // O passo de código é apenas visual: a API não expõe verificação de código.
             ForgotPasswordAction.OnVerifyCodeClick -> _uiState.update { it.copy(step = ForgotPasswordStep.NEW_PASSWORD) }
