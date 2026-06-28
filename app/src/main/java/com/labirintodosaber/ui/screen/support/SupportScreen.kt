@@ -2,6 +2,7 @@ package com.labirintodosaber.ui.screen.support
 
 import androidx.compose.ui.res.stringResource
 import com.labirintodosaber.R
+import com.labirintodosaber.ui.components.ProfileActionIcon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -66,9 +67,7 @@ fun SupportScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onProfileClick) {
-                        Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.dashboard_profile_desc), tint = TextPrimary, modifier = Modifier.size(28.dp))
-                    }
+                    ProfileActionIcon(onClick = onProfileClick)
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
             )

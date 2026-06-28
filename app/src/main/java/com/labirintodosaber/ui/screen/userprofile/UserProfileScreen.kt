@@ -48,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.labirintodosaber.R
+import com.labirintodosaber.ui.components.ProfileActionIcon
 import com.labirintodosaber.ui.theme.TealPrimary
 import com.labirintodosaber.ui.theme.TextPrimary
 import com.labirintodosaber.ui.theme.TextSecondary
@@ -88,9 +89,7 @@ private fun UserProfileContent(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onProfileClick) {
-                        Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.dashboard_profile_desc), tint = TextPrimary, modifier = Modifier.size(28.dp))
-                    }
+                    ProfileActionIcon(onClick = onProfileClick)
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
             )

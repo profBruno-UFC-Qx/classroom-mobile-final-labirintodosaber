@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.labirintodosaber.ui.components.AppMenuDrawer
+import com.labirintodosaber.ui.components.LocalProfilePhotoUrl
 import com.labirintodosaber.ui.components.ProfileMenuBottomSheet
 import com.labirintodosaber.ui.screen.activities.ActivitiesScreen
 import com.labirintodosaber.ui.screen.activityanswer.ActivityAnswerScreen
@@ -89,6 +91,7 @@ fun AppNavGraph(
     val onMenuClick: () -> Unit = { scope.launch { drawerState.open() } }
     val onProfileClick: () -> Unit = { showProfileSheet = true }
 
+    CompositionLocalProvider(LocalProfilePhotoUrl provides profileUiState.photoUrl) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = drawerEnabled && !showProfileSheet,
@@ -434,6 +437,7 @@ fun AppNavGraph(
                 },
             )
         }
+    }
     }
 }
 
