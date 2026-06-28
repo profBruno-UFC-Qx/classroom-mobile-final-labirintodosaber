@@ -2,6 +2,7 @@ package com.labirintodosaber.ui.screen.userprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.labirintodosaber.data.local.UserPreferencesStore
 import com.labirintodosaber.data.remote.ApiResult
 import com.labirintodosaber.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,19 +13,24 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** Tela "Meu Perfil" é apenas de visualização — exibe os dados do educador logado. */
 data class UserProfileUiState(
     val name: String = "",
     val email: String = "",
     val contact: String = "",
     val photoUrl: String? = null,
+    val isDarkTheme: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 )
 
+sealed interface UserProfileAction {
+    data object OnToggleDarkTheme : UserProfileAction
+}
+
 @HiltViewModel
 class UserProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val userPreferencesStore: UserPreferencesStore,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UserProfileUiState())
@@ -32,9 +38,17 @@ class UserProfileViewModel @Inject constructor(
 
     init {
         load()
+        observeTheme()
     }
 
-    /** Recarrega os dados do educador (ex.: após autenticar). */
+    fun onAction(action: UserProfileAction) {
+        when (action) {
+            UserProfileAction.OnToggleDarkTheme -> viewModelScope.launch {
+                userPreferencesStore.setDarkTheme(!_uiState.value.isDarkTheme)
+            }
+        }
+    }
+
     fun refresh() = load()
 
     private fun load() {
@@ -54,6 +68,14 @@ class UserProfileViewModel @Inject constructor(
                     }
                 }
                 is ApiResult.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+            }
+        }
+    }
+
+    private fun observeTheme() {
+        viewModelScope.launch {
+            userPreferencesStore.isDarkTheme.collect { isDark ->
+                _uiState.update { it.copy(isDarkTheme = isDark) }
             }
         }
     }
