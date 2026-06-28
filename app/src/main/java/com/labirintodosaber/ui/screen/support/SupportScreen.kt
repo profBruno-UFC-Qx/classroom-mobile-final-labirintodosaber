@@ -93,21 +93,21 @@ fun SupportScreen(
                     ContactRow(
                         icon = Icons.Outlined.Email,
                         label = "Email",
-                        value = "suporte@labirintodosaber.com",
+                        value = "zerogamerptbr@gmail.com",
                         iconColor = TealPrimary,
                     )
                     HorizontalDivider(color = Color(0xFFE5E7EB), modifier = Modifier.padding(horizontal = 16.dp))
                     ContactRow(
                         icon = Icons.Outlined.Phone,
                         label = "Telefone",
-                        value = "(85) 3333-4444",
+                        value = "(88) 98110-8406",
                         iconColor = Color(0xFF16A34A),
                     )
                     HorizontalDivider(color = Color(0xFFE5E7EB), modifier = Modifier.padding(horizontal = 16.dp))
                     ContactRow(
                         icon = Icons.Outlined.QuestionAnswer,
                         label = "WhatsApp",
-                        value = "(85) 99999-8888",
+                        value = "(88) 98110-8406",
                         iconColor = Color(0xFF16A34A),
                     )
                 }
