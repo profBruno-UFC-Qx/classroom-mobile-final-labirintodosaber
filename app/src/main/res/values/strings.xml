@@ -105,7 +105,7 @@
     <string name="add_student_complement_label">Complemento</string>
     <string name="add_student_complement_placeholder">Apto, Bloco, etc</string>
     <string name="add_student_additional_info_title">Informações Adicionais (Opcional)</string>
-    <string name="add_student_additional_info_hint">Documentos e anamnese podem ser preenchidos agora ou depois</string>
+    <string name="add_student_additional_info_hint">Documentos podem ser preenchidos agora ou depois</string>
     <string name="add_student_cancel">Cancelar</string>
     <string name="add_student_save">Salvar e Finalizar Cadastro</string>
 
@@ -119,14 +119,12 @@
     <string name="student_profile_tab_progress">Progresso</string>
     <string name="student_profile_tab_sessions">Sessões</string>
     <string name="student_profile_tab_documents">Documentos</string>
-    <string name="student_profile_tab_anamnese">Anamnese</string>
     <string name="student_profile_progress_category_title">Progresso por Categoria</string>
     <string name="student_profile_sessions_empty">Nenhuma sessão registrada para este aluno.</string>
+    <!-- removidas: strings de anamnese (descontinuada) -->
     <string name="student_profile_documents_empty">Nenhum relatório gerado ainda.</string>
-    <string name="student_profile_anamnese_empty">Nenhuma anamnese respondida.</string>
     <string name="student_profile_session_finished">%1$s • %2$d questões</string>
     <string name="student_profile_session_ongoing">%1$s • em andamento</string>
-    <string name="student_profile_anamnese_answered_at">Respondida em %1$s</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">Tela Inicial</string>
@@ -250,8 +248,6 @@
     <string name="reports_content_metrics_desc">Gráficos, porcentagem de acertos e estatísticas gerais</string>
     <string name="reports_content_qualitative">Observações Qualitativas</string>
     <string name="reports_content_qualitative_desc">Comentários e observações das sessões</string>
-    <string name="reports_content_anamnese">Dados da Anamnese</string>
-    <string name="reports_content_anamnese_desc">Resumo de dados médicos e de desenvolvimento do aluno</string>
     <string name="reports_export_button">Exportar Relatório em PDF</string>
     <string name="reports_export_subtitle">Relatório de %1$s</string>
     <string name="reports_export_no_student">aluno não selecionado</string>

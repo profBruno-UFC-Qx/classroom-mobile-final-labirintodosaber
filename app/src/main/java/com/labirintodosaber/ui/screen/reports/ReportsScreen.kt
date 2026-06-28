@@ -363,13 +363,6 @@ private fun ReportsContent(
                     checked = uiState.includeQualitative,
                     onToggle = { onAction(ReportsAction.OnToggleQualitative(!uiState.includeQualitative)) },
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-                ReportCheckboxRow(
-                    label = stringResource(R.string.reports_content_anamnese),
-                    description = stringResource(R.string.reports_content_anamnese_desc),
-                    checked = uiState.includeAnamnese,
-                    onToggle = { onAction(ReportsAction.OnToggleAnamnese(!uiState.includeAnamnese)) },
-                )
             }
 
             // Botão exportar

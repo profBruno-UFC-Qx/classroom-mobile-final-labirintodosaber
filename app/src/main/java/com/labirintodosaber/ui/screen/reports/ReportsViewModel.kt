@@ -2,22 +2,16 @@ package com.labirintodosaber.ui.screen.reports
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.labirintodosaber.data.model.AnamneseQuestion
-import com.labirintodosaber.data.model.AnamneseResponse
-import com.labirintodosaber.data.model.AnamneseTemplate
 import com.labirintodosaber.data.model.StudentAnalysis
 import com.labirintodosaber.data.model.TaskCategory
 import com.labirintodosaber.data.model.TaskNotebookSession
-import com.labirintodosaber.data.pdf.ReportPdfAnamnese
 import com.labirintodosaber.data.pdf.ReportPdfCategory
 import com.labirintodosaber.data.pdf.ReportPdfData
 import com.labirintodosaber.data.pdf.ReportPdfGenerator
 import com.labirintodosaber.data.pdf.ReportPdfObservation
-import com.labirintodosaber.data.pdf.ReportPdfQa
 import com.labirintodosaber.data.pdf.ReportPdfSession
 import com.labirintodosaber.data.remote.ApiResult
 import com.labirintodosaber.data.remote.getOrNull
-import com.labirintodosaber.data.repository.AnamneseRepository
 import com.labirintodosaber.data.repository.SessionRepository
 import com.labirintodosaber.data.repository.StudentRepository
 import com.labirintodosaber.ui.screen.activities.displayName
@@ -56,7 +50,6 @@ data class ReportsUiState(
     val sessionPreviews: List<ReportSessionPreview> = emptyList(),
     val includeMetrics: Boolean = true,
     val includeQualitative: Boolean = true,
-    val includeAnamnese: Boolean = false,
     val canExport: Boolean = false,
     val showDateRangePicker: Boolean = false,
     val customStartDateMs: Long? = null,
@@ -74,7 +67,6 @@ sealed interface ReportsAction {
     data class OnPeriodSelect(val period: ReportPeriod) : ReportsAction
     data class OnToggleMetrics(val checked: Boolean) : ReportsAction
     data class OnToggleQualitative(val checked: Boolean) : ReportsAction
-    data class OnToggleAnamnese(val checked: Boolean) : ReportsAction
     data object OnExportPdf : ReportsAction
     data object OnShowDatePicker : ReportsAction
     data object OnDismissDatePicker : ReportsAction
@@ -87,7 +79,6 @@ sealed interface ReportsAction {
 class ReportsViewModel @Inject constructor(
     private val studentRepository: StudentRepository,
     private val sessionRepository: SessionRepository,
-    private val anamneseRepository: AnamneseRepository,
     private val pdfGenerator: ReportPdfGenerator,
 ) : ViewModel() {
 
@@ -112,7 +103,6 @@ class ReportsViewModel @Inject constructor(
             }
             is ReportsAction.OnToggleMetrics -> _uiState.update { it.copy(includeMetrics = action.checked) }
             is ReportsAction.OnToggleQualitative -> _uiState.update { it.copy(includeQualitative = action.checked) }
-            is ReportsAction.OnToggleAnamnese -> _uiState.update { it.copy(includeAnamnese = action.checked) }
             ReportsAction.OnExportPdf -> exportPdf()
             ReportsAction.OnShowDatePicker -> _uiState.update { it.copy(showDateRangePicker = true) }
             ReportsAction.OnDismissDatePicker -> _uiState.update { it.copy(showDateRangePicker = false) }
@@ -214,9 +204,7 @@ class ReportsViewModel @Inject constructor(
             // Persiste o snapshot no histórico (best-effort; não bloqueia o PDF).
             sessionRepository.snapshot(studentId, startDate = startIso, endDate = endIso)
 
-            val anamnese = if (state.includeAnamnese) loadAnamnese(studentId) else emptyList()
-
-            val data = buildPdfData(state, analysis, anamnese)
+            val data = buildPdfData(state, analysis)
             val fileName = "relatorio-${(state.selectedStudentName ?: "aluno").sanitized()}-${System.currentTimeMillis()}.pdf"
             val generated = runCatching { pdfGenerator.generate(data, fileName) }.getOrNull()
 
@@ -228,17 +216,9 @@ class ReportsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadAnamnese(studentId: String): List<ReportPdfAnamnese> {
-        val responses = anamneseRepository.listResponsesByStudent(studentId).getOrNull().orEmpty()
-        if (responses.isEmpty()) return emptyList()
-        val templatesById = anamneseRepository.listTemplates().getOrNull().orEmpty().associateBy { it.id }
-        return responses.map { it.toPdfBlock(templatesById[it.templateId]) }
-    }
-
     private fun buildPdfData(
         state: ReportsUiState,
         analysis: StudentAnalysis,
-        anamnese: List<ReportPdfAnamnese>,
     ): ReportPdfData {
         val zone = ZoneId.systemDefault()
         val categories = analysis.categories.values
@@ -270,14 +250,12 @@ class ReportsViewModel @Inject constructor(
             generatedAt = OffsetDateTime.now().format(GENERATED_AT_FORMAT),
             includeMetrics = state.includeMetrics,
             includeQualitative = state.includeQualitative,
-            includeAnamnese = state.includeAnamnese,
             overallCorrect = analysis.total.correct,
             overallTotal = analysis.total.total,
             overallAccuracyPercent = (analysis.total.accuracy * 100).toInt(),
             categories = categories,
             sessions = sessions,
             observations = observations,
-            anamnese = anamnese,
         )
     }
 
@@ -314,35 +292,6 @@ private fun TaskCategory.colorInt(): Int = when (this) {
     TaskCategory.WRITING -> 0xFFEA580C.toInt()
     TaskCategory.VOCABULARY -> 0xFF7C3AED.toInt()
     TaskCategory.COMPREHENSION -> 0xFF16A34A.toInt()
-}
-
-private fun AnamneseResponse.toPdfBlock(template: AnamneseTemplate?): ReportPdfAnamnese {
-    val questionsById = template?.questions?.associateBy { it.id }.orEmpty()
-    val items = answers.map { answer ->
-        val question = questionsById[answer.questionId]
-        ReportPdfQa(
-            question = question?.text ?: "Pergunta",
-            answer = answer.toDisplayText(question),
-        )
-    }
-    return ReportPdfAnamnese(
-        title = template?.title ?: "Anamnese",
-        date = answeredAt.toInstantOrNull()?.atZone(ZoneId.systemDefault())?.format(PREVIEW_DATE_FORMAT).orEmpty(),
-        items = items,
-    )
-}
-
-private fun com.labirintodosaber.data.model.AnamneseAnswer.toDisplayText(question: AnamneseQuestion?): String {
-    textValue?.takeIf { it.isNotBlank() }?.let { return it }
-    selectedOptionId?.let { id ->
-        return question?.options?.firstOrNull { it.id == id }?.text ?: "—"
-    }
-    selectedOptionIds?.takeIf { it.isNotEmpty() }?.let { ids ->
-        val opts = question?.options.orEmpty()
-        return ids.mapNotNull { id -> opts.firstOrNull { it.id == id }?.text }.joinToString(", ").ifBlank { "—" }
-    }
-    fileUrl?.takeIf { it.isNotBlank() }?.let { return "Arquivo anexado" }
-    return "—"
 }
 
 private fun String.sanitized(): String = trim().replace(Regex("[^A-Za-z0-9]+"), "_").trim('_').ifBlank { "aluno" }

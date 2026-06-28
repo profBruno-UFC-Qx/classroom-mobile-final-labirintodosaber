@@ -18,8 +18,6 @@ import javax.inject.Singleton
 data class ReportPdfCategory(val label: String, val percent: Int, val colorInt: Int)
 data class ReportPdfSession(val name: String, val date: String, val score: String)
 data class ReportPdfObservation(val sessionName: String, val text: String)
-data class ReportPdfQa(val question: String, val answer: String)
-data class ReportPdfAnamnese(val title: String, val date: String, val items: List<ReportPdfQa>)
 
 data class ReportPdfData(
     val studentName: String,
@@ -27,14 +25,12 @@ data class ReportPdfData(
     val generatedAt: String,
     val includeMetrics: Boolean,
     val includeQualitative: Boolean,
-    val includeAnamnese: Boolean,
     val overallCorrect: Int,
     val overallTotal: Int,
     val overallAccuracyPercent: Int,
     val categories: List<ReportPdfCategory>,
     val sessions: List<ReportPdfSession>,
     val observations: List<ReportPdfObservation>,
-    val anamnese: List<ReportPdfAnamnese>,
 )
 
 data class GeneratedPdf(val file: File, val savedToDownloads: Boolean)
@@ -101,20 +97,6 @@ class ReportPdfGenerator @Inject constructor(
             data.observations.forEach { obs ->
                 drawer.line(obs.sessionName, BODY_BOLD)
                 drawer.wrapped(obs.text, BODY, gapAfter = 8f)
-            }
-        }
-
-        if (data.includeAnamnese && data.anamnese.isNotEmpty()) {
-            drawer.divider()
-            drawer.line("Anamnese", H2)
-            data.anamnese.forEach { block ->
-                drawer.line(block.title, BODY_BOLD)
-                if (block.date.isNotBlank()) drawer.line(block.date, MUTED)
-                block.items.forEach { qa ->
-                    drawer.wrapped(qa.question, BODY_BOLD, gapAfter = 2f)
-                    drawer.wrapped(qa.answer.ifBlank { "—" }, BODY, gapAfter = 8f)
-                }
-                drawer.gap(6f)
             }
         }
 

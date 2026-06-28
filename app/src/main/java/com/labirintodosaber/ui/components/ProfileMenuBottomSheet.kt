@@ -46,7 +46,6 @@ fun ProfileMenuBottomSheet(
     userEmail: String,
     onDismiss: () -> Unit,
     onMeuPerfil: () -> Unit,
-    onAnamnese: () -> Unit,
     onPrivacidade: () -> Unit,
     onSuporte: () -> Unit,
     onLogout: () -> Unit,
@@ -90,11 +89,6 @@ fun ProfileMenuBottomSheet(
                 icon = Icons.Outlined.AccountCircle,
                 label = "Meu Perfil",
                 onClick = onMeuPerfil,
-            )
-            ProfileMenuItem(
-                icon = Icons.Outlined.Description,
-                label = "Formulários - Anamnese",
-                onClick = onAnamnese,
             )
             ProfileMenuItem(
                 icon = Icons.Outlined.Lock,

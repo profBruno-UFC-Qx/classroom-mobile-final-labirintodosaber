@@ -26,7 +26,6 @@ import com.labirintodosaber.ui.components.ProfileMenuBottomSheet
 import com.labirintodosaber.ui.screen.activities.ActivitiesScreen
 import com.labirintodosaber.ui.screen.activityanswer.ActivityAnswerScreen
 import com.labirintodosaber.ui.screen.addstudent.AddStudentScreen
-import com.labirintodosaber.ui.screen.anamnese.AnamneseScreen
 import com.labirintodosaber.ui.screen.createactivity.CreateActivityScreen
 import com.labirintodosaber.ui.screen.createnotebook.CreateNotebookScreen
 import com.labirintodosaber.ui.screen.createtaskgroup.CreateTaskGroupScreen
@@ -380,12 +379,6 @@ fun AppNavGraph(
                     onProfileClick = onProfileClick,
                 )
             }
-            composable(AppDestination.Anamnese.route) {
-                AnamneseScreen(
-                    onBack = { navController.popBackStack() },
-                    onProfileClick = onProfileClick,
-                )
-            }
         }
 
         if (showProfileSheet) {
@@ -396,10 +389,6 @@ fun AppNavGraph(
                 onMeuPerfil = {
                     showProfileSheet = false
                     navController.navigate(AppDestination.UserProfile.route) { launchSingleTop = true }
-                },
-                onAnamnese = {
-                    showProfileSheet = false
-                    navController.navigate(AppDestination.Anamnese.route) { launchSingleTop = true }
                 },
                 onPrivacidade = {
                     showProfileSheet = false
@@ -464,5 +453,4 @@ sealed class AppDestination(val route: String) {
     data object UserProfile : AppDestination("user-profile")
     data object Privacy : AppDestination("privacy")
     data object Support : AppDestination("support")
-    data object Anamnese : AppDestination("anamnese")
 }

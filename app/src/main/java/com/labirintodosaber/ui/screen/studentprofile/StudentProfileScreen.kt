@@ -136,7 +136,6 @@ private fun StudentProfileContent(
                 StudentProfileTab.PROGRESS -> ProgressTabContent(uiState = uiState)
                 StudentProfileTab.SESSIONS -> SessionsTabContent(sessions = uiState.sessions, onSessionClick = onSessionClick)
                 StudentProfileTab.DOCUMENTS -> DocumentsTabContent(documents = uiState.documents)
-                StudentProfileTab.ANAMNESE -> AnamneseTabContent(anamneses = uiState.anamneses)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -279,7 +278,6 @@ private fun ProfileTabRow(
         StudentProfileTab.PROGRESS to stringResource(R.string.student_profile_tab_progress),
         StudentProfileTab.SESSIONS to stringResource(R.string.student_profile_tab_sessions),
         StudentProfileTab.DOCUMENTS to stringResource(R.string.student_profile_tab_documents),
-        StudentProfileTab.ANAMNESE to stringResource(R.string.student_profile_tab_anamnese),
     )
 
     Card(
@@ -489,41 +487,6 @@ private fun DocumentsTabContent(
                     )
                 }
                 if (index < documents.lastIndex) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-        }
-    }
-}
-
-// ── Anamneses ─────────────────────────────────────────────────────────────────
-
-@Composable
-private fun AnamneseTabContent(
-    anamneses: List<AnamneseRow>,
-    modifier: Modifier = Modifier,
-) {
-    TabCard(modifier = modifier) {
-        if (anamneses.isEmpty()) {
-            EmptyTabMessage(text = stringResource(R.string.student_profile_anamnese_empty))
-        } else {
-            anamneses.forEachIndexed { index, anamnese ->
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = anamnese.title,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                        fontSize = 10.sp,
-                    )
-                    Text(
-                        text = stringResource(R.string.student_profile_anamnese_answered_at, anamnese.date),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
-                        fontSize = 8.sp,
-                    )
-                }
-                if (index < anamneses.lastIndex) {
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }

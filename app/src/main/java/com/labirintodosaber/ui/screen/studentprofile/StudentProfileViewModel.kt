@@ -3,14 +3,11 @@ package com.labirintodosaber.ui.screen.studentprofile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.labirintodosaber.data.model.AnamneseResponse
-import com.labirintodosaber.data.model.AnamneseTemplate
 import com.labirintodosaber.data.model.Gender
 import com.labirintodosaber.data.model.Student
 import com.labirintodosaber.data.model.StudentAnalysisReport
 import com.labirintodosaber.data.model.TaskNotebookSession
 import com.labirintodosaber.data.remote.getOrNull
-import com.labirintodosaber.data.repository.AnamneseRepository
 import com.labirintodosaber.data.repository.SessionRepository
 import com.labirintodosaber.data.repository.StudentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +27,6 @@ import kotlin.math.roundToInt
 class StudentProfileViewModel @Inject constructor(
     private val studentRepository: StudentRepository,
     private val sessionRepository: SessionRepository,
-    private val anamneseRepository: AnamneseRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -74,10 +70,6 @@ class StudentProfileViewModel @Inject constructor(
             val documents = sessionRepository.analysisHistory(studentId).getOrNull().orEmpty()
                 .mapIndexed { index, report -> report.toDocumentRow(index) }
 
-            val templates = anamneseRepository.listTemplates().getOrNull().orEmpty()
-            val anamneses = anamneseRepository.listResponsesByStudent(studentId).getOrNull().orEmpty()
-                .map { it.toAnamneseRow(templates) }
-
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -92,7 +84,6 @@ class StudentProfileViewModel @Inject constructor(
                     categoryProgress = categories,
                     sessions = sessions,
                     documents = documents,
-                    anamneses = anamneses,
                 )
             }
         }
@@ -139,12 +130,6 @@ private fun StudentAnalysisReport.toDocumentRow(index: Int) = DocumentRow(
     accuracyPercent = (accuracy * 100).roundToInt(),
 )
 
-private fun AnamneseResponse.toAnamneseRow(templates: List<AnamneseTemplate>) = AnamneseRow(
-    id = id,
-    title = templates.firstOrNull { it.id == templateId }?.title ?: "Anamnese",
-    date = answeredAt.formatDate(),
-)
-
 private fun categoryName(wire: String): String = when (wire) {
     "reading" -> "Leitura"
     "writing" -> "Escrita"
@@ -162,7 +147,7 @@ private fun String.formatDate(): String {
     return instant.atZone(ZoneId.systemDefault()).format(DATE_FORMAT)
 }
 
-enum class StudentProfileTab { PROGRESS, SESSIONS, DOCUMENTS, ANAMNESE }
+enum class StudentProfileTab { PROGRESS, SESSIONS, DOCUMENTS }
 
 data class CategoryProgress(val name: String, val percent: Int)
 
@@ -181,12 +166,6 @@ data class DocumentRow(
     val accuracyPercent: Int,
 )
 
-data class AnamneseRow(
-    val id: String,
-    val title: String,
-    val date: String,
-)
-
 data class StudentProfileUiState(
     val name: String = "",
     val age: Int = 0,
@@ -201,7 +180,6 @@ data class StudentProfileUiState(
     val categoryProgress: List<CategoryProgress> = emptyList(),
     val sessions: List<SessionRow> = emptyList(),
     val documents: List<DocumentRow> = emptyList(),
-    val anamneses: List<AnamneseRow> = emptyList(),
     val selectedTab: StudentProfileTab = StudentProfileTab.PROGRESS,
     val isLoading: Boolean = false,
     val isGeneratingReport: Boolean = false,
