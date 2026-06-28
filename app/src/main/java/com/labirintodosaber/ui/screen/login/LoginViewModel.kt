@@ -28,7 +28,6 @@ class LoginViewModel @Inject constructor(
             LoginAction.OnTogglePasswordVisibility -> _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
             LoginAction.OnLoginClick -> signIn()
             LoginAction.OnLoginHandled -> _uiState.update { it.copy(loginSuccess = false) }
-            LoginAction.OnGoogleLoginClick -> { /* TODO: implementar Google Sign-In */ }
         }
     }
 
@@ -65,5 +64,4 @@ sealed interface LoginAction {
     data object OnTogglePasswordVisibility : LoginAction
     data object OnLoginClick : LoginAction
     data object OnLoginHandled : LoginAction
-    data object OnGoogleLoginClick : LoginAction
 }
