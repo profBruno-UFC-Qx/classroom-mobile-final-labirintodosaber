@@ -277,6 +277,11 @@
     <string name="session_report_descriptive_placeholder">Adicione observações detalhadas sobre o desempenho do aluno durante a sessão…</string>
     <string name="session_report_save">Salvar Relatório</string>
 
+    <!-- Activity detail (consulta) -->
+    <string name="activity_detail_title">Detalhes da Atividade</string>
+    <string name="activity_detail_alternatives">Alternativas (a correta está destacada):</string>
+    <string name="activity_detail_correct_desc">Alternativa correta</string>
+
     <!-- Report PDF -->
     <string name="report_pdf_title">Relatório (PDF)</string>
     <string name="report_pdf_error">Não foi possível abrir o relatório.</string>

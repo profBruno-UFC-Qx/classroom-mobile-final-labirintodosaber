@@ -40,6 +40,8 @@ class ActivityAnswerViewModel @Inject constructor(
                         isLoading = false,
                         prompt = result.data.prompt,
                         categoryLabel = result.data.category.displayName(),
+                        imageUrl = result.data.imageFile?.takeIf { url -> url.isNotBlank() },
+                        hasAudio = !result.data.audioFile.isNullOrBlank(),
                         alternatives = result.data.alternatives.map { alt ->
                             AnswerAlternative(text = alt.text, isCorrect = alt.isCorrect)
                         },
@@ -61,6 +63,8 @@ data class AnswerAlternative(
 data class ActivityAnswerUiState(
     val prompt: String = "",
     val categoryLabel: String = "",
+    val imageUrl: String? = null,
+    val hasAudio: Boolean = false,
     val alternatives: List<AnswerAlternative> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,

@@ -2,13 +2,13 @@ package com.labirintodosaber.ui.screen.activityanswer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.VolumeUp
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,23 +33,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.labirintodosaber.R
-import com.labirintodosaber.ui.theme.TealDark
-import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
 import com.labirintodosaber.ui.theme.TextPrimary
 import com.labirintodosaber.ui.theme.TextSecondary
@@ -78,17 +75,13 @@ private fun ActivityAnswerContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var selectedIndex by rememberSaveable { mutableStateOf<Int?>(null) }
-    var confirmed by rememberSaveable { mutableStateOf(false) }
-    val answered = confirmed && selectedIndex != null
-
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = uiState.categoryLabel.ifBlank { "Atividade" },
+                        text = stringResource(R.string.activity_detail_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary,
@@ -120,10 +113,14 @@ private fun ActivityAnswerContent(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50.dp))
                         .background(TealPrimary)
-                        .clickable { onRetry() }
                         .padding(horizontal = 20.dp, vertical = 10.dp),
                 ) {
-                    Text(stringResource(R.string.students_retry), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
+                    Text(
+                        text = stringResource(R.string.students_retry),
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clip(RoundedCornerShape(50.dp)),
+                    )
                 }
             }
 
@@ -142,6 +139,27 @@ private fun ActivityAnswerContent(
                     ) {
                         Column {
                             CategoryBadge(uiState.categoryLabel)
+                            if (uiState.imageUrl != null) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                AsyncImage(
+                                    model = uiState.imageUrl,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(1.5f)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFFF8FAFA)),
+                                )
+                            }
+                            if (uiState.hasAudio) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.AutoMirrored.Outlined.VolumeUp, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(18.dp))
+                                    Spacer(modifier = Modifier.size(6.dp))
+                                    Text("Possui áudio", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                                }
+                            }
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = uiState.prompt,
@@ -156,7 +174,7 @@ private fun ActivityAnswerContent(
 
                 item {
                     Text(
-                        text = "Escolha a alternativa correta:",
+                        text = stringResource(R.string.activity_detail_alternatives),
                         style = MaterialTheme.typography.labelLarge,
                         color = TextSecondary,
                         modifier = Modifier.padding(horizontal = 4.dp),
@@ -164,73 +182,11 @@ private fun ActivityAnswerContent(
                 }
 
                 itemsIndexed(uiState.alternatives) { index, alternative ->
-                    val isSelected = selectedIndex == index
-                    val isCorrect = alternative.isCorrect
-                    val showFeedback = answered
-
-                    val borderColor = when {
-                        showFeedback && isCorrect -> Color(0xFF4CAF50)
-                        showFeedback && isSelected && !isCorrect -> Color(0xFFE53935)
-                        isSelected -> TealPrimary
-                        else -> Color(0xFFE5E7EB)
-                    }
-                    val bgColor = when {
-                        showFeedback && isCorrect -> Color(0xFFE8F5E9)
-                        showFeedback && isSelected && !isCorrect -> Color(0xFFFFEBEE)
-                        isSelected -> TealPrimary.copy(alpha = 0.08f)
-                        else -> Color.White
-                    }
-
-                    AlternativeItem(
+                    AlternativeRow(
                         label = AlternativeLabels.getOrElse(index) { "$index" },
                         text = alternative.text,
-                        isSelected = isSelected,
-                        borderColor = borderColor,
-                        bgColor = bgColor,
-                        showCorrectIcon = showFeedback && isCorrect,
-                        enabled = !answered,
-                        onClick = { if (!answered) selectedIndex = index },
+                        isCorrect = alternative.isCorrect,
                     )
-                }
-
-                if (!answered) {
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(
-                                    if (selectedIndex != null)
-                                        Brush.horizontalGradient(listOf(TealDark, TealLight))
-                                    else
-                                        Brush.horizontalGradient(listOf(Color(0xFFBDBDBD), Color(0xFFBDBDBD)))
-                                )
-                                .clickable(enabled = selectedIndex != null) { confirmed = true },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text("Confirmar Resposta", color = Color.White, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
-                } else {
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        val acertou = uiState.alternatives.getOrNull(selectedIndex!!)?.isCorrect == true
-                        FeedbackBanner(acertou = acertou)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Brush.horizontalGradient(listOf(TealDark, TealLight)))
-                                .clickable { onBackClick() },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(stringResource(R.string.back_button), color = Color.White, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
                 }
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -240,24 +196,20 @@ private fun ActivityAnswerContent(
 }
 
 @Composable
-private fun AlternativeItem(
+private fun AlternativeRow(
     label: String,
     text: String,
-    isSelected: Boolean,
-    borderColor: Color,
-    bgColor: Color,
-    showCorrectIcon: Boolean,
-    enabled: Boolean,
-    onClick: () -> Unit,
+    isCorrect: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val borderColor = if (isCorrect) Color(0xFF4CAF50) else Color(0xFFE5E7EB)
+    val bgColor = if (isCorrect) Color(0xFFE8F5E9) else Color.White
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(bgColor)
             .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
-            .clickable(enabled = enabled) { onClick() }
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -266,14 +218,14 @@ private fun AlternativeItem(
             modifier = Modifier
                 .size(32.dp)
                 .clip(CircleShape)
-                .background(if (isSelected) TealPrimary else Color(0xFFF0F0F0)),
+                .background(if (isCorrect) Color(0xFF4CAF50) else Color(0xFFF0F0F0)),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = if (isSelected) Color.White else TextSecondary,
+                color = if (isCorrect) Color.White else TextSecondary,
             )
         }
         Text(
@@ -282,21 +234,9 @@ private fun AlternativeItem(
             color = TextPrimary,
             modifier = Modifier.weight(1f),
         )
-        if (showCorrectIcon) {
-            Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp))
+        if (isCorrect) {
+            Icon(Icons.Outlined.CheckCircle, contentDescription = stringResource(R.string.activity_detail_correct_desc), tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp))
         }
-    }
-}
-
-@Composable
-private fun FeedbackBanner(acertou: Boolean, modifier: Modifier = Modifier) {
-    val bgColor = if (acertou) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
-    val textColor = if (acertou) Color(0xFF2E7D32) else Color(0xFFC62828)
-    val message = if (acertou) "Parabéns! Resposta correta! 🎉" else "Não foi dessa vez. Tente novamente! 💪"
-    Box(
-        modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(bgColor).padding(16.dp),
-    ) {
-        Text(message, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = textColor)
     }
 }
 
