@@ -273,6 +273,21 @@ internal fun PaginationRow(
     onPageChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Monta a sequência de itens visíveis: números de página ou -1 para elipse.
+    val items: List<Int> = buildList {
+        if (totalPages <= 7) {
+            addAll(0 until totalPages)
+        } else {
+            add(0)
+            val windowStart = (currentPage - 1).coerceAtLeast(1)
+            val windowEnd = (currentPage + 1).coerceAtMost(totalPages - 2)
+            if (windowStart > 1) add(-1) // elipse esquerda
+            addAll(windowStart..windowEnd)
+            if (windowEnd < totalPages - 2) add(-1) // elipse direita
+            add(totalPages - 1)
+        }
+    }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -289,17 +304,26 @@ internal fun PaginationRow(
             )
         }
 
-        (0 until totalPages).forEach { pageIndex ->
-            val isCurrentPage = currentPage == pageIndex
-            Text(
-                text = "${pageIndex + 1}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = if (isCurrentPage) FontWeight.Bold else FontWeight.Normal,
-                color = if (isCurrentPage) TealPrimary else TextSecondary,
-                modifier = Modifier
-                    .padding(horizontal = 6.dp)
-                    .clickable { onPageChange(pageIndex) },
-            )
+        items.forEach { pageIndex ->
+            if (pageIndex == -1) {
+                Text(
+                    text = "…",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
+            } else {
+                val isCurrentPage = currentPage == pageIndex
+                Text(
+                    text = "${pageIndex + 1}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = if (isCurrentPage) FontWeight.Bold else FontWeight.Normal,
+                    color = if (isCurrentPage) TealPrimary else TextSecondary,
+                    modifier = Modifier
+                        .padding(horizontal = 6.dp)
+                        .clickable { onPageChange(pageIndex) },
+                )
+            }
         }
 
         IconButton(

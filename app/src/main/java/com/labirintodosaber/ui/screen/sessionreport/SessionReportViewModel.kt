@@ -104,7 +104,7 @@ class SessionReportViewModel @Inject constructor(
                             professional = professional,
                             date = sessionDate,
                             totalQuestions = report.totalQuestions,
-                            totalTime = report.totalTimeSession.toClock(),
+                            totalTime = (report.totalTimeSession ?: 0.0).toClock(),
                             avgResponseTime = report.averageTimePerQuestion.toClock(),
                             avgCorrectTime = (report.averageCorrectTime ?: 0.0).toClock(),
                             avgWrongTime = (report.averageIncorrectTime ?: 0.0).toClock(),

@@ -372,6 +372,8 @@ private fun SessionCard(
                     text = session.category,
                     style = MaterialTheme.typography.labelSmall,
                     color = TextSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             Spacer(modifier = Modifier.height(6.dp))

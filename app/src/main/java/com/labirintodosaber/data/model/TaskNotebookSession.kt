@@ -27,7 +27,7 @@ data class SessionAnswer(
 @Serializable
 data class SessionReport(
     val sessionName: String,
-    val totalTimeSession: Double,
+    val totalTimeSession: Double? = null,
     val totalQuestions: Int,
     val averageTimePerQuestion: Double,
     val averageCorrectTime: Double? = null,
