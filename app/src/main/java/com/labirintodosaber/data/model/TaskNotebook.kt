@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TaskNotebook(
     val id: String,
-    val educator: String,
+    val educator: Educator,
     val tasks: List<String> = emptyList(),
     val category: TaskCategory,
     val description: String,

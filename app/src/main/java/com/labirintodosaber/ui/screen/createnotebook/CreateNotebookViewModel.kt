@@ -101,7 +101,7 @@ class CreateNotebookViewModel @Inject constructor(
         val request = TaskNotebookCreateRequest(
             tasks = derivedTasks,
             category = checkNotNull(state.category),
-            description = state.description.ifBlank { state.name }.trim(),
+            description = state.name.trim(),
             taskGroupsIds = state.selectedGroupIds.toList(),
         )
 
