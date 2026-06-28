@@ -3,7 +3,6 @@ package com.labirintodosaber.ui.screen.agenda
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.labirintodosaber.data.model.Appointment
-import com.labirintodosaber.data.model.AppointmentStatus
 import com.labirintodosaber.data.remote.getOrNull
 import com.labirintodosaber.data.repository.AppointmentRepository
 import com.labirintodosaber.data.repository.StudentRepository
@@ -70,6 +69,7 @@ class AgendaViewModel @Inject constructor(
             val namesById = studentRepository.list().getOrNull().orEmpty().associate { it.id to it.name }
             val zone = ZoneId.systemDefault()
             val today = LocalDate.now()
+            val now = Instant.now()
 
             // Agrupa por dia, dias em ordem crescente e atendimentos por horário.
             val sections = appointments
@@ -82,7 +82,11 @@ class AgendaViewModel @Inject constructor(
                         items = entries
                             .sortedBy { (zoned, _) -> zoned }
                             .map { (zoned, appt) ->
-                                appt.toItem(namesById[appt.studentId] ?: "Aluno", zoned.format(TIME_FORMAT))
+                                appt.toItem(
+                                    studentName = namesById[appt.studentId] ?: "Aluno",
+                                    timeLabel = zoned.format(TIME_FORMAT),
+                                    past = zoned.toInstant().isBefore(now),
+                                )
                             },
                     )
                 }
@@ -92,12 +96,13 @@ class AgendaViewModel @Inject constructor(
     }
 }
 
-private fun Appointment.toItem(studentName: String, timeLabel: String) = AgendaItem(
+private fun Appointment.toItem(studentName: String, timeLabel: String, past: Boolean) = AgendaItem(
     id = id,
     studentName = studentName,
     timeLabel = timeLabel,
-    statusLabel = status.label(),
-    statusColorHex = status.colorHex(),
+    // Status derivado do horário: já passou = Realizado; ainda não = Pendente.
+    statusLabel = if (past) "Realizado" else "Pendente",
+    statusColorHex = if (past) 0xFF16A34A else 0xFFEA580C,
     observation = observation?.takeIf { it.isNotBlank() },
 )
 
@@ -105,18 +110,6 @@ private fun LocalDate.headerTitle(today: LocalDate): String = when (this) {
     today -> "Hoje • ${format(HEADER_FORMAT)}"
     today.plusDays(1) -> "Amanhã • ${format(HEADER_FORMAT)}"
     else -> format(HEADER_FORMAT).replaceFirstChar { it.uppercase() }
-}
-
-private fun AppointmentStatus.label(): String = when (this) {
-    AppointmentStatus.PENDING -> "Pendente"
-    AppointmentStatus.COMPLETED -> "Concluído"
-    AppointmentStatus.CANCELLED -> "Cancelado"
-}
-
-private fun AppointmentStatus.colorHex(): Long = when (this) {
-    AppointmentStatus.PENDING -> 0xFFEA580C
-    AppointmentStatus.COMPLETED -> 0xFF16A34A
-    AppointmentStatus.CANCELLED -> 0xFFDC2626
 }
 
 private fun String.toInstantOrNull(): Instant? =
