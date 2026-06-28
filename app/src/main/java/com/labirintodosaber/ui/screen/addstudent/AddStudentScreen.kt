@@ -1,5 +1,11 @@
 package com.labirintodosaber.ui.screen.addstudent
 
+import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -61,7 +67,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
 import com.labirintodosaber.R
+import com.labirintodosaber.data.remote.FileUpload
 import com.labirintodosaber.ui.components.ProfileActionIcon
 import com.labirintodosaber.ui.theme.GradientBottom
 import com.labirintodosaber.ui.theme.InputBorder
@@ -108,6 +118,11 @@ private fun AddStudentContent(
     onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        uri?.let { onAction(AddStudentAction.OnPhotoPicked(context.toStudentPhotoUpload(it))) }
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -137,7 +152,14 @@ private fun AddStudentContent(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item { PhotoSection() }
+            item {
+                PhotoSection(
+                    photoBytes = uiState.photo?.bytes,
+                    onPickPhoto = {
+                        photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    },
+                )
+            }
 
             item {
                 FormCard {
@@ -323,7 +345,11 @@ private fun AddStudentContent(
 // ── Photo Section ─────────────────────────────────────────────────────────────
 
 @Composable
-private fun PhotoSection(modifier: Modifier = Modifier) {
+private fun PhotoSection(
+    photoBytes: ByteArray?,
+    onPickPhoto: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -337,21 +363,32 @@ private fun PhotoSection(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .size(68.dp)
                     .clip(CircleShape)
-                    .background(TealLight),
+                    .background(TealLight)
+                    .clickable { onPickPhoto() },
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Person,
-                    contentDescription = null,
-                    tint = TealPrimary,
-                    modifier = Modifier.size(34.dp),
-                )
+                if (photoBytes != null) {
+                    AsyncImage(
+                        model = photoBytes,
+                        contentDescription = stringResource(R.string.add_student_photo_button),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().clip(CircleShape),
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Outlined.Person,
+                        contentDescription = null,
+                        tint = TealPrimary,
+                        modifier = Modifier.size(34.dp),
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Surface(
                     shape = RoundedCornerShape(50.dp),
                     color = Color.Transparent,
+                    onClick = onPickPhoto,
                     modifier = Modifier.border(1.5.dp, TextPrimary, RoundedCornerShape(50.dp)),
                 ) {
                     Row(
@@ -361,7 +398,9 @@ private fun PhotoSection(modifier: Modifier = Modifier) {
                         Icon(Icons.Outlined.Add, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = stringResource(R.string.add_student_photo_button),
+                            text = stringResource(
+                                if (photoBytes != null) R.string.add_student_photo_change else R.string.add_student_photo_button,
+                            ),
                             style = MaterialTheme.typography.labelMedium,
                             color = TextPrimary,
                         )
@@ -377,6 +416,16 @@ private fun PhotoSection(modifier: Modifier = Modifier) {
         }
     }
 }
+
+/** Lê a imagem escolhida (Photo Picker) e converte em [FileUpload] com bytes resolvidos. */
+private fun Context.toStudentPhotoUpload(uri: Uri): FileUpload? = runCatching {
+    val mime = contentResolver.getType(uri) ?: "image/*"
+    val name = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) cursor.getString(0) else null
+    } ?: "foto"
+    val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return null
+    FileUpload(fileName = name, bytes = bytes, mimeType = mime)
+}.getOrNull()
 
 // ── Additional Info Section ───────────────────────────────────────────────────
 

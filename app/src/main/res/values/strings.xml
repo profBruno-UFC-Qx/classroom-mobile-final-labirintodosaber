@@ -85,6 +85,7 @@
 
     <!-- Add Student -->
     <string name="add_student_photo_button">Adicionar foto</string>
+    <string name="add_student_photo_change">Trocar foto</string>
     <string name="add_student_photo_hint">Opcional - Pode ser adicionada depois</string>
     <string name="add_student_full_name_label">Nome Completo</string>
     <string name="add_student_full_name_placeholder">Digite o nome completo do aluno</string>

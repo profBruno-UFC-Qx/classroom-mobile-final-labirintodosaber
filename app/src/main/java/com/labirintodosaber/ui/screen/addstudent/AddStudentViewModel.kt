@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.labirintodosaber.data.model.Gender
 import com.labirintodosaber.data.remote.ApiResult
+import com.labirintodosaber.data.remote.FileUpload
 import com.labirintodosaber.data.remote.dto.StudentForm
 import com.labirintodosaber.data.repository.StudentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,6 +33,7 @@ class AddStudentViewModel @Inject constructor(
             is AddStudentAction.OnStreetChange -> _uiState.update { it.copy(street = action.value.take(100), errorMessage = null) }
             is AddStudentAction.OnNumberChange -> _uiState.update { it.copy(number = action.value.take(10), errorMessage = null) }
             is AddStudentAction.OnComplementChange -> _uiState.update { it.copy(complement = action.value) }
+            is AddStudentAction.OnPhotoPicked -> _uiState.update { it.copy(photo = action.file) }
             is AddStudentAction.OnLearningTopicsChange -> _uiState.update { it.copy(learningTopics = action.value, errorMessage = null) }
             AddStudentAction.OnToggleAdditionalInfo -> _uiState.update { it.copy(showAdditionalInfo = !it.showAdditionalInfo) }
             AddStudentAction.OnSaveClick -> save()
@@ -75,7 +77,7 @@ class AddStudentViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = studentRepository.create(form)) {
+            when (val result = studentRepository.create(form, state.photo)) {
                 is ApiResult.Success -> _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
                 is ApiResult.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
             }
@@ -99,6 +101,7 @@ data class AddStudentUiState(
     val number: String = "",
     val complement: String = "",
     val learningTopics: String = "",
+    val photo: FileUpload? = null,
     val showAdditionalInfo: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
@@ -114,6 +117,7 @@ sealed interface AddStudentAction {
     data class OnStreetChange(val value: String) : AddStudentAction
     data class OnNumberChange(val value: String) : AddStudentAction
     data class OnComplementChange(val value: String) : AddStudentAction
+    data class OnPhotoPicked(val file: FileUpload?) : AddStudentAction
     data class OnLearningTopicsChange(val value: String) : AddStudentAction
     data object OnToggleAdditionalInfo : AddStudentAction
     data object OnSaveClick : AddStudentAction
