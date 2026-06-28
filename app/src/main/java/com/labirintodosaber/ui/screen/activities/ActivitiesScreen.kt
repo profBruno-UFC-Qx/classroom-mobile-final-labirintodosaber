@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -479,7 +480,7 @@ private fun ActivitiesBottomBar(
         NavigationBarItem(
             selected = true,
             onClick = {},
-            icon = { Icon(Icons.Filled.Menu, contentDescription = null) },
+            icon = { Icon(Icons.AutoMirrored.Outlined.MenuBook, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_activities), style = MaterialTheme.typography.labelSmall) },
             colors = navItemColors(),
         )
