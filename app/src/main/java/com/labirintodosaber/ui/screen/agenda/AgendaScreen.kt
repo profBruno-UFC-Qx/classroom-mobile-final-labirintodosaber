@@ -129,7 +129,7 @@ private fun AgendaContent(
                 Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
             }
 
-            uiState.appointments.isEmpty() -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+            uiState.sections.isEmpty() -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Outlined.CalendarMonth, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(48.dp))
                     Spacer(modifier = Modifier.height(8.dp))
@@ -140,10 +140,21 @@ private fun AgendaContent(
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(uiState.appointments) { item ->
-                    AppointmentCard(item = item, onClick = { onAppointmentClick(item.id) })
+                uiState.sections.forEach { section ->
+                    item(key = section.dateTitle) {
+                        Text(
+                            text = section.dateTitle,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = TealPrimary,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+                        )
+                    }
+                    items(section.items, key = { it.id }) { item ->
+                        AppointmentCard(item = item, onClick = { onAppointmentClick(item.id) })
+                    }
                 }
             }
         }
@@ -173,10 +184,6 @@ private fun AppointmentCard(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.CalendarMonth, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(item.dateLabel, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)
-                Spacer(modifier = Modifier.width(16.dp))
                 Icon(Icons.Outlined.Schedule, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(item.timeLabel, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)

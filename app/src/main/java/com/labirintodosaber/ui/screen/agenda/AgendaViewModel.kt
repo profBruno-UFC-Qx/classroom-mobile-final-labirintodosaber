@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -23,15 +24,20 @@ import javax.inject.Inject
 data class AgendaItem(
     val id: String,
     val studentName: String,
-    val dateLabel: String,
     val timeLabel: String,
     val statusLabel: String,
     val statusColorHex: Long,
     val observation: String?,
 )
 
+/** Atendimentos de um mesmo dia, com cabeçalho de data (estilo agenda/calendário). */
+data class AgendaDaySection(
+    val dateTitle: String,
+    val items: List<AgendaItem>,
+)
+
 data class AgendaUiState(
-    val appointments: List<AgendaItem> = emptyList(),
+    val sections: List<AgendaDaySection> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 )
@@ -50,7 +56,7 @@ class AgendaViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
-            val isFirstLoad = _uiState.value.appointments.isEmpty()
+            val isFirstLoad = _uiState.value.sections.isEmpty()
             if (isFirstLoad) _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             val appointments = appointmentRepository.list().getOrNull()
@@ -62,28 +68,43 @@ class AgendaViewModel @Inject constructor(
                 return@launch
             }
             val namesById = studentRepository.list().getOrNull().orEmpty().associate { it.id to it.name }
+            val zone = ZoneId.systemDefault()
+            val today = LocalDate.now()
 
-            val items = appointments
-                .sortedByDescending { it.scheduledAt }
-                .map { it.toItem(namesById[it.studentId] ?: "Aluno") }
+            // Agrupa por dia, dias em ordem crescente e atendimentos por horário.
+            val sections = appointments
+                .mapNotNull { appt -> appt.scheduledAt.toInstantOrNull()?.let { it.atZone(zone) to appt } }
+                .groupBy { (zoned, _) -> zoned.toLocalDate() }
+                .toSortedMap()
+                .map { (date, entries) ->
+                    AgendaDaySection(
+                        dateTitle = date.headerTitle(today),
+                        items = entries
+                            .sortedBy { (zoned, _) -> zoned }
+                            .map { (zoned, appt) ->
+                                appt.toItem(namesById[appt.studentId] ?: "Aluno", zoned.format(TIME_FORMAT))
+                            },
+                    )
+                }
 
-            _uiState.update { it.copy(isLoading = false, errorMessage = null, appointments = items) }
+            _uiState.update { it.copy(isLoading = false, errorMessage = null, sections = sections) }
         }
     }
 }
 
-private fun Appointment.toItem(studentName: String): AgendaItem {
-    val instant = scheduledAt.toInstantOrNull()
-    val zoned = instant?.atZone(ZoneId.systemDefault())
-    return AgendaItem(
-        id = id,
-        studentName = studentName,
-        dateLabel = zoned?.format(DATE_FORMAT) ?: scheduledAt,
-        timeLabel = zoned?.format(TIME_FORMAT) ?: "",
-        statusLabel = status.label(),
-        statusColorHex = status.colorHex(),
-        observation = observation?.takeIf { it.isNotBlank() },
-    )
+private fun Appointment.toItem(studentName: String, timeLabel: String) = AgendaItem(
+    id = id,
+    studentName = studentName,
+    timeLabel = timeLabel,
+    statusLabel = status.label(),
+    statusColorHex = status.colorHex(),
+    observation = observation?.takeIf { it.isNotBlank() },
+)
+
+private fun LocalDate.headerTitle(today: LocalDate): String = when (this) {
+    today -> "Hoje • ${format(HEADER_FORMAT)}"
+    today.plusDays(1) -> "Amanhã • ${format(HEADER_FORMAT)}"
+    else -> format(HEADER_FORMAT).replaceFirstChar { it.uppercase() }
 }
 
 private fun AppointmentStatus.label(): String = when (this) {
@@ -102,5 +123,5 @@ private fun String.toInstantOrNull(): Instant? =
     runCatching { Instant.parse(this) }.getOrNull()
         ?: runCatching { OffsetDateTime.parse(this).toInstant() }.getOrNull()
 
-private val DATE_FORMAT = DateTimeFormatter.ofPattern("dd 'de' MMM 'de' yyyy", Locale("pt", "BR"))
+private val HEADER_FORMAT = DateTimeFormatter.ofPattern("EEE, dd 'de' MMM", Locale("pt", "BR"))
 private val TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm")
