@@ -30,7 +30,6 @@ class RegisterViewModel @Inject constructor(
             RegisterAction.OnToggleConfirmPasswordVisibility -> _uiState.update { it.copy(confirmPasswordVisible = !it.confirmPasswordVisible) }
             RegisterAction.OnRegisterClick -> register()
             RegisterAction.OnRegisterHandled -> _uiState.update { it.copy(registerSuccess = false) }
-            RegisterAction.OnGoogleRegisterClick -> { /* TODO: implementar Google Sign-In */ }
         }
     }
 
@@ -85,5 +84,4 @@ sealed interface RegisterAction {
     data object OnToggleConfirmPasswordVisibility : RegisterAction
     data object OnRegisterClick : RegisterAction
     data object OnRegisterHandled : RegisterAction
-    data object OnGoogleRegisterClick : RegisterAction
 }

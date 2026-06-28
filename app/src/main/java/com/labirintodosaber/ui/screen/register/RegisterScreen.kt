@@ -1,6 +1,5 @@
 package com.labirintodosaber.ui.screen.register
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,14 +25,11 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -55,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
-import com.labirintodosaber.ui.theme.DividerColor
 import com.labirintodosaber.ui.theme.GradientBottom
 import com.labirintodosaber.ui.theme.GradientMid
 import com.labirintodosaber.ui.theme.GradientTop
@@ -336,48 +331,6 @@ private fun RegisterForm(
                     color = Color.White,
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Divisor OU
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            HorizontalDivider(modifier = Modifier.weight(1f), color = DividerColor)
-            Text(
-                text = stringResource(R.string.register_or_divider),
-                modifier = Modifier.padding(horizontal = 16.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
-            )
-            HorizontalDivider(modifier = Modifier.weight(1f), color = DividerColor)
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Botão Google
-        OutlinedButton(
-            onClick = { onAction(RegisterAction.OnGoogleRegisterClick) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, InputBorder),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-        ) {
-            Text(
-                text = "G",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4285F4),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.register_google_button),
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextPrimary,
-            )
         }
         Spacer(modifier = Modifier.height(20.dp))
 
