@@ -78,7 +78,7 @@ fun AppNavGraph(
 
     // Carrega o educador quando chega numa tela principal já autenticado (o init do VM roda antes do login).
     LaunchedEffect(currentRoute) {
-        if (currentRoute in mainRoutes && profileUiState.displayName.isBlank()) {
+        if (currentRoute in mainRoutes && profileUiState.name.isBlank()) {
             profileViewModel.refresh()
         }
     }
@@ -93,8 +93,8 @@ fun AppNavGraph(
         drawerContent = {
             AppMenuDrawer(
                 currentRoute = currentRoute,
-                userName = profileUiState.displayName,
-                userRole = profileUiState.role,
+                userName = profileUiState.name,
+                userEmail = profileUiState.email,
                 onNavigate = { route ->
                     scope.launch { drawerState.close() }
                     if (currentRoute != route) {
@@ -390,8 +390,8 @@ fun AppNavGraph(
 
         if (showProfileSheet) {
             ProfileMenuBottomSheet(
-                userName = profileUiState.displayName,
-                userRole = profileUiState.role,
+                userName = profileUiState.name,
+                userEmail = profileUiState.email,
                 onDismiss = { showProfileSheet = false },
                 onMeuPerfil = {
                     showProfileSheet = false

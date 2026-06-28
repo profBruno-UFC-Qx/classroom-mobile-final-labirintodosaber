@@ -45,7 +45,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun AppMenuDrawer(
     currentRoute: String,
     userName: String,
-    userRole: String,
+    userEmail: String,
     onNavigate: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -130,7 +130,7 @@ fun AppMenuDrawer(
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(userName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = TextPrimary)
-                Text(userRole, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text(userEmail, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
             }
         }
     }

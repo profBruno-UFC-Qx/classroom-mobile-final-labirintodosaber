@@ -43,7 +43,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 @Composable
 fun ProfileMenuBottomSheet(
     userName: String,
-    userRole: String,
+    userEmail: String,
     onDismiss: () -> Unit,
     onMeuPerfil: () -> Unit,
     onAnamnese: () -> Unit,
@@ -80,7 +80,7 @@ fun ProfileMenuBottomSheet(
                 Spacer(modifier = Modifier.width(14.dp))
                 Column {
                     Text(userName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    Text(userRole, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                    Text(userEmail, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
                 }
             }
 
