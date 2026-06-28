@@ -278,6 +278,23 @@
     <string name="activity_detail_alternatives">Alternativas (a correta está destacada):</string>
     <string name="activity_detail_correct_desc">Alternativa correta</string>
 
+    <!-- Agenda / Agendamentos -->
+    <string name="agenda_title">Agenda</string>
+    <string name="agenda_new">Novo</string>
+    <string name="agenda_empty">Nenhum atendimento agendado.</string>
+    <string name="agenda_menu_label">Agenda</string>
+    <string name="appointment_new_title">Novo Agendamento</string>
+    <string name="appointment_edit_title">Editar Agendamento</string>
+    <string name="appointment_student_label">Aluno</string>
+    <string name="appointment_student_placeholder">Selecione o aluno</string>
+    <string name="appointment_date_label">Data</string>
+    <string name="appointment_time_label">Horário</string>
+    <string name="appointment_observation_label">Observação</string>
+    <string name="appointment_observation_placeholder">Anotações sobre o atendimento (opcional)</string>
+    <string name="appointment_save">Salvar Agendamento</string>
+    <string name="appointment_delete">Excluir Agendamento</string>
+    <string name="appointment_cancel">Cancelar</string>
+
     <!-- Report PDF -->
     <string name="report_pdf_title">Relatório (PDF)</string>
     <string name="report_pdf_error">Não foi possível abrir o relatório.</string>

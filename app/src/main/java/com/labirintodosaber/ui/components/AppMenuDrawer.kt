@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -95,6 +96,7 @@ fun AppMenuDrawer(
             Triple("Tela Inicial",  Icons.Outlined.Home,                     AppDestination.Dashboard.route),
             Triple("Atividades",    Icons.AutoMirrored.Outlined.MenuBook,    AppDestination.Activities.route),
             Triple("Alunos",        Icons.Outlined.Person,                   AppDestination.Students.route),
+            Triple("Agenda",        Icons.Outlined.CalendarMonth,            AppDestination.Agenda.route),
             Triple("Relatórios",    Icons.AutoMirrored.Outlined.Assignment,  AppDestination.Reports.route),
         )
 

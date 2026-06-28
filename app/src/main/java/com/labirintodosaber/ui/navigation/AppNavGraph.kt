@@ -26,6 +26,8 @@ import com.labirintodosaber.ui.components.ProfileMenuBottomSheet
 import com.labirintodosaber.ui.screen.activities.ActivitiesScreen
 import com.labirintodosaber.ui.screen.activityanswer.ActivityAnswerScreen
 import com.labirintodosaber.ui.screen.addstudent.AddStudentScreen
+import com.labirintodosaber.ui.screen.agenda.AgendaScreen
+import com.labirintodosaber.ui.screen.appointmentform.AppointmentFormScreen
 import com.labirintodosaber.ui.screen.createactivity.CreateActivityScreen
 import com.labirintodosaber.ui.screen.createnotebook.CreateNotebookScreen
 import com.labirintodosaber.ui.screen.createtaskgroup.CreateTaskGroupScreen
@@ -72,6 +74,7 @@ fun AppNavGraph(
         AppDestination.Activities.route,
         AppDestination.Students.route,
         AppDestination.Reports.route,
+        AppDestination.Agenda.route,
     )
     val drawerEnabled = currentRoute in mainRoutes
 
@@ -235,6 +238,31 @@ fun AppNavGraph(
                             launchSingleTop = true
                         }
                     },
+                )
+            }
+            composable(AppDestination.Agenda.route) {
+                AgendaScreen(
+                    onNewAppointment = { navController.navigate(AppDestination.AppointmentCreate.route) },
+                    onAppointmentClick = { id ->
+                        navController.navigate(AppDestination.AppointmentEdit.createRoute(id))
+                    },
+                    onMenuClick = onMenuClick,
+                    onProfileClick = onProfileClick,
+                )
+            }
+            composable(AppDestination.AppointmentCreate.route) {
+                AppointmentFormScreen(
+                    onBack = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() },
+                )
+            }
+            composable(
+                route = AppDestination.AppointmentEdit.route,
+                arguments = listOf(navArgument("appointmentId") { type = NavType.StringType }),
+            ) {
+                AppointmentFormScreen(
+                    onBack = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() },
                 )
             }
             composable(AppDestination.Students.route) {
@@ -433,6 +461,11 @@ sealed class AppDestination(val route: String) {
         fun createRoute(taskId: String) = "activity-answer/$taskId"
     }
     data object Reports : AppDestination("reports")
+    data object Agenda : AppDestination("agenda")
+    data object AppointmentCreate : AppDestination("appointment/create")
+    data object AppointmentEdit : AppDestination("appointment/edit/{appointmentId}") {
+        fun createRoute(appointmentId: String) = "appointment/edit/$appointmentId"
+    }
     data object SessionReport : AppDestination("session-report/{sessionId}/{studentId}") {
         fun createRoute(sessionId: String, studentId: String) = "session-report/$sessionId/$studentId"
     }
