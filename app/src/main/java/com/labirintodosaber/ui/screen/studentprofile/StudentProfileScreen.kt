@@ -21,11 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -53,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.theme.GradientBottom
+import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
 import com.labirintodosaber.ui.theme.TextPrimary
@@ -209,38 +212,21 @@ private fun StudentInfoCard(
                                 color = TextSecondary,
                             )
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Surface(
-                                shape = RoundedCornerShape(13.dp),
-                                color = Color.White,
-                                shadowElevation = 2.dp,
-                                modifier = Modifier.border(1.dp, TealPrimary, RoundedCornerShape(13.dp)),
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.student_profile_generate_report),
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 7.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TealPrimary,
+                        Surface(
+                            shape = RoundedCornerShape(13.dp),
+                            color = TealPrimary,
+                            shadowElevation = 2.dp,
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clickable { onAction(StudentProfileAction.OnEditClick) },
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = stringResource(R.string.student_profile_edit_desc),
+                                    tint = Color.White,
+                                    modifier = Modifier.size(15.dp),
                                 )
-                            }
-                            Surface(
-                                shape = RoundedCornerShape(13.dp),
-                                color = TealPrimary,
-                                shadowElevation = 2.dp,
-                                modifier = Modifier
-                                    .size(22.dp)
-                                    .clickable { onAction(StudentProfileAction.OnEditClick) },
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Edit,
-                                        contentDescription = stringResource(R.string.student_profile_edit_desc),
-                                        tint = Color.White,
-                                        modifier = Modifier.size(12.dp),
-                                    )
-                                }
                             }
                         }
                     }
@@ -252,6 +238,39 @@ private fun StudentInfoCard(
                     InfoRow(label = stringResource(R.string.student_profile_address_label), value = uiState.address)
                     Spacer(modifier = Modifier.height(4.dp))
                     InfoRow(label = stringResource(R.string.student_profile_objective_label), value = uiState.objective)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Botão de gerar relatório — largura total e clicável
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Brush.horizontalGradient(listOf(TealDark, TealLight)))
+                    .clickable(enabled = !uiState.isGeneratingReport) { onAction(StudentProfileAction.OnGenerateReportClick) },
+                contentAlignment = Alignment.Center,
+            ) {
+                if (uiState.isGeneratingReport) {
+                    CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.Assignment,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.student_profile_generate_report),
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
         }
