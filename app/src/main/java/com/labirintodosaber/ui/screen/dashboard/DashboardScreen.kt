@@ -85,6 +85,8 @@ fun DashboardScreen(
     onStartSessionClick: () -> Unit = {},
     onMenuClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
+    onSessionClick: (sessionId: String, studentId: String) -> Unit = { _, _ -> },
+    onActivityClick: (taskId: String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
@@ -104,6 +106,8 @@ fun DashboardScreen(
         onStartSessionClick = onStartSessionClick,
         onMenuClick = onMenuClick,
         onProfileClick = onProfileClick,
+        onSessionClick = onSessionClick,
+        onActivityClick = onActivityClick,
         modifier = modifier,
     )
 }
@@ -119,6 +123,8 @@ private fun DashboardContent(
     onStartSessionClick: () -> Unit = {},
     onMenuClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
+    onSessionClick: (sessionId: String, studentId: String) -> Unit = { _, _ -> },
+    onActivityClick: (taskId: String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -209,7 +215,7 @@ private fun DashboardContent(
                     items(uiState.todaySessions) { session ->
                         SessionCard(
                             session = session,
-                            onClick = { onAction(DashboardAction.OnSessionClick(session.id)) },
+                            onClick = { onSessionClick(session.id, session.studentId) },
                         )
                     }
                 }
@@ -221,8 +227,8 @@ private fun DashboardContent(
                 pastSessions = uiState.pastSessions,
                 activities = uiState.recentActivities,
                 onSeeAll = { onAction(DashboardAction.OnSeeAllSessionsClick) },
-                onPastSessionClick = { onAction(DashboardAction.OnPastSessionClick(it)) },
-                onActivityClick = { onAction(DashboardAction.OnActivityClick(it)) },
+                onPastSessionClick = { session -> onSessionClick(session.id, session.studentId) },
+                onActivityClick = onActivityClick,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
 
@@ -393,7 +399,7 @@ private fun PastSessionsCard(
     pastSessions: List<PastSessionItem>,
     activities: List<ActivityItem>,
     onSeeAll: () -> Unit,
-    onPastSessionClick: (String) -> Unit,
+    onPastSessionClick: (PastSessionItem) -> Unit,
     onActivityClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -436,7 +442,7 @@ private fun PastSessionsCard(
                 pastSessions.forEachIndexed { index, session ->
                     PastSessionRow(
                         session = session,
-                        onClick = { onPastSessionClick(session.id) },
+                        onClick = { onPastSessionClick(session) },
                     )
                     if (index < pastSessions.lastIndex) {
                         Spacer(modifier = Modifier.height(8.dp))

@@ -142,6 +142,12 @@ fun AppNavGraph(
                     onStartSessionClick = { navController.navigate(AppDestination.SessionSelectStudent.route) },
                     onMenuClick = onMenuClick,
                     onProfileClick = onProfileClick,
+                    onSessionClick = { sessionId, studentId ->
+                        navController.navigate(AppDestination.SessionReport.createRoute(sessionId, studentId))
+                    },
+                    onActivityClick = { taskId ->
+                        navController.navigate(AppDestination.ActivityAnswer.createRoute(taskId))
+                    },
                 )
             }
             composable(AppDestination.SessionSelectStudent.route) {

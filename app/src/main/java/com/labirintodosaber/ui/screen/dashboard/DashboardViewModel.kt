@@ -110,6 +110,7 @@ private val AVATAR_PALETTE = listOf(0xFF4A90E2, 0xFF50C878, 0xFFE94B8F, 0xFF9B59
 
 private fun TaskNotebookSession.toTodayItem(student: Student, index: Int) = SessionItem(
     id = id,
+    studentId = student.id,
     studentName = student.name,
     time = startedAt.formatTime(),
     category = name,
@@ -120,6 +121,7 @@ private fun TaskNotebookSession.toTodayItem(student: Student, index: Int) = Sess
 
 private fun TaskNotebookSession.toPastItem(student: Student) = PastSessionItem(
     id = id,
+    studentId = student.id,
     studentName = student.name,
     date = startedAt.formatDate(),
     time = startedAt.formatTime(),
@@ -209,6 +211,7 @@ data class DashboardUiState(
 
 data class SessionItem(
     val id: String,
+    val studentId: String,
     val studentName: String,
     val time: String,
     val category: String,
@@ -219,6 +222,7 @@ data class SessionItem(
 
 data class PastSessionItem(
     val id: String,
+    val studentId: String,
     val studentName: String,
     val date: String,
     val time: String,
