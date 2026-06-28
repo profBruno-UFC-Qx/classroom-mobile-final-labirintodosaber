@@ -66,6 +66,8 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun SessionConfigureScreen(
     onBack: () -> Unit,
     onStartSession: (studentId: String, contentIds: String, sessionName: String) -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SessionConfigureViewModel = hiltViewModel(),
 ) {
@@ -87,6 +89,8 @@ fun SessionConfigureScreen(
     SessionConfigureContent(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -96,11 +100,13 @@ fun SessionConfigureScreen(
 private fun SessionConfigureContent(
     uiState: SessionConfigureUiState,
     onAction: (SessionConfigureAction) -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { SessionTopBar() },
+        topBar = { SessionTopBar(onMenuClick = onMenuClick, onProfileClick = onProfileClick) },
         bottomBar = {
             Column {
                 SessionActionButtonsRow(

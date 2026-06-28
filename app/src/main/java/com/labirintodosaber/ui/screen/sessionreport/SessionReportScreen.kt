@@ -69,6 +69,8 @@ import com.labirintodosaber.ui.theme.TextSecondary
 @Composable
 fun SessionReportScreen(
     onHomeClick: () -> Unit = {},
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SessionReportViewModel = hiltViewModel(),
 ) {
@@ -78,6 +80,8 @@ fun SessionReportScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onHomeClick = onHomeClick,
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -88,6 +92,8 @@ private fun SessionReportContent(
     uiState: SessionReportUiState,
     onAction: (SessionReportAction) -> Unit,
     onHomeClick: () -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -102,13 +108,13 @@ private fun SessionReportContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Outlined.Menu, contentDescription = null, tint = TextPrimary)
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Outlined.AccountCircle, contentDescription = null, tint = TextPrimary)
+                    IconButton(onClick = onProfileClick) {
+                        Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.dashboard_profile_desc), tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),

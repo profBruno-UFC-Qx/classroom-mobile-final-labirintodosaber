@@ -62,6 +62,7 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun StudentProfileScreen(
     onBackClick: () -> Unit,
     onSessionClick: (String) -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: StudentProfileViewModel = hiltViewModel(),
 ) {
@@ -71,6 +72,7 @@ fun StudentProfileScreen(
         onAction = viewModel::onAction,
         onBackClick = onBackClick,
         onSessionClick = onSessionClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -82,6 +84,7 @@ private fun StudentProfileContent(
     onAction: (StudentProfileAction) -> Unit,
     onBackClick: () -> Unit,
     onSessionClick: (String) -> Unit,
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -105,7 +108,7 @@ private fun StudentProfileContent(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO */ }) {
+                    IconButton(onClick = onProfileClick) {
                         Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.dashboard_profile_desc), tint = TextPrimary, modifier = Modifier.size(28.dp))
                     }
                 },

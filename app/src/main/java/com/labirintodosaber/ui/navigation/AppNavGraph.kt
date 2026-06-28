@@ -83,9 +83,8 @@ fun AppNavGraph(
         }
     }
 
-    val onMenuClick: () -> Unit = {
-        if (drawerEnabled) scope.launch { drawerState.open() }
-    }
+    // O menu (drawer) é navegação global: abre a partir de qualquer tela autenticada.
+    val onMenuClick: () -> Unit = { scope.launch { drawerState.open() } }
     val onProfileClick: () -> Unit = { showProfileSheet = true }
 
     ModalNavigationDrawer(
@@ -156,6 +155,8 @@ fun AppNavGraph(
                     onNextStep = { studentId ->
                         navController.navigate(AppDestination.SessionConfigure.createRoute(studentId))
                     },
+                    onMenuClick = onMenuClick,
+                    onProfileClick = onProfileClick,
                 )
             }
             composable(
@@ -169,6 +170,8 @@ fun AppNavGraph(
                             AppDestination.SessionRun.createRoute(studentId, contentIds, sessionName)
                         )
                     },
+                    onMenuClick = onMenuClick,
+                    onProfileClick = onProfileClick,
                 )
             }
             composable(
@@ -189,6 +192,8 @@ fun AppNavGraph(
                             popUpTo(AppDestination.Dashboard.route) { inclusive = false }
                         }
                     },
+                    onMenuClick = onMenuClick,
+                    onProfileClick = onProfileClick,
                 )
             }
             composable(
@@ -205,6 +210,8 @@ fun AppNavGraph(
                             launchSingleTop = true
                         }
                     },
+                    onMenuClick = onMenuClick,
+                    onProfileClick = onProfileClick,
                 )
             }
             composable(AppDestination.Reports.route) {
@@ -258,6 +265,8 @@ fun AppNavGraph(
                 AddStudentScreen(
                     onCancelClick = { navController.popBackStack() },
                     onSaveSuccess = { navController.popBackStack() },
+                    onMenuClick = onMenuClick,
+                    onProfileClick = onProfileClick,
                 )
             }
             composable(
@@ -272,6 +281,7 @@ fun AppNavGraph(
                             AppDestination.SessionReport.createRoute(sessionId, profileStudentId)
                         )
                     },
+                    onProfileClick = onProfileClick,
                 )
             }
             composable(AppDestination.Activities.route) {

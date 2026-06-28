@@ -73,6 +73,8 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun AddStudentScreen(
     onCancelClick: () -> Unit,
     onSaveSuccess: () -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: AddStudentViewModel = hiltViewModel(),
 ) {
@@ -89,6 +91,8 @@ fun AddStudentScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onCancelClick = onCancelClick,
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -99,6 +103,8 @@ private fun AddStudentContent(
     uiState: AddStudentUiState,
     onAction: (AddStudentAction) -> Unit,
     onCancelClick: () -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -113,12 +119,12 @@ private fun AddStudentContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: drawer */ }) {
+                    IconButton(onClick = onMenuClick) {
                         Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO */ }) {
+                    IconButton(onClick = onProfileClick) {
                         Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.dashboard_profile_desc), tint = TextPrimary, modifier = Modifier.size(28.dp))
                     }
                 },

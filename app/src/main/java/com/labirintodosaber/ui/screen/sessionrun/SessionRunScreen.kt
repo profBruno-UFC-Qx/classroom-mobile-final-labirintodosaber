@@ -68,6 +68,8 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun SessionRunScreen(
     onBack: () -> Unit,
     onFinishSession: (String) -> Unit = { onBack() },
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SessionRunViewModel = hiltViewModel(),
 ) {
@@ -81,6 +83,8 @@ fun SessionRunScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onFinish = { viewModel.onAction(SessionRunAction.OnFinishSession) },
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -91,11 +95,13 @@ private fun SessionRunContent(
     uiState: SessionRunUiState,
     onAction: (SessionRunAction) -> Unit,
     onFinish: () -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { SessionTopBar() },
+        topBar = { SessionTopBar(onMenuClick = onMenuClick, onProfileClick = onProfileClick) },
         bottomBar = {
             Column {
                 if (uiState.isFinished) {

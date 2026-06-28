@@ -77,6 +77,8 @@ import com.labirintodosaber.ui.theme.TextSecondary
 fun SessionSelectStudentScreen(
     onBack: () -> Unit,
     onNextStep: (studentId: String) -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SessionSelectStudentViewModel = hiltViewModel(),
 ) {
@@ -94,6 +96,8 @@ fun SessionSelectStudentScreen(
     SessionSelectStudentContent(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onMenuClick = onMenuClick,
+        onProfileClick = onProfileClick,
         modifier = modifier,
     )
 }
@@ -103,11 +107,13 @@ fun SessionSelectStudentScreen(
 private fun SessionSelectStudentContent(
     uiState: SessionSelectStudentUiState,
     onAction: (SessionSelectStudentAction) -> Unit,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { SessionTopBar() },
+        topBar = { SessionTopBar(onMenuClick = onMenuClick, onProfileClick = onProfileClick) },
         bottomBar = {
             Column {
                 SessionActionButtonsRow(
@@ -384,7 +390,11 @@ internal fun SessionActionButtonsRow(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun SessionTopBar(modifier: Modifier = Modifier) {
+internal fun SessionTopBar(
+    modifier: Modifier = Modifier,
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+) {
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
@@ -395,7 +405,7 @@ internal fun SessionTopBar(modifier: Modifier = Modifier) {
             )
         },
         navigationIcon = {
-            IconButton(onClick = { }) {
+            IconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = Icons.Outlined.Menu,
                     contentDescription = stringResource(R.string.session_menu_desc),
@@ -404,7 +414,7 @@ internal fun SessionTopBar(modifier: Modifier = Modifier) {
             }
         },
         actions = {
-            IconButton(onClick = { }) {
+            IconButton(onClick = onProfileClick) {
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = stringResource(R.string.session_profile_desc),
