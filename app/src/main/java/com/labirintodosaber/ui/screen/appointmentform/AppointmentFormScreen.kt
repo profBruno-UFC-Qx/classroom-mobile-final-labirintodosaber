@@ -62,13 +62,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
-import com.labirintodosaber.ui.theme.InputBackground
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun AppointmentFormScreen(
@@ -107,18 +103,18 @@ private fun AppointmentFormContent(
                     Text(
                         text = stringResource(if (uiState.isEdit) R.string.appointment_edit_title else R.string.appointment_new_title),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back_button), tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back_button), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -176,16 +172,16 @@ private fun AppointmentFormContent(
                 OutlinedTextField(
                     value = uiState.observation,
                     onValueChange = { onAction(AppointmentFormAction.OnObservationChange(it)) },
-                    placeholder = { Text(stringResource(R.string.appointment_observation_placeholder), color = TextSecondary) },
+                    placeholder = { Text(stringResource(R.string.appointment_observation_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     minLines = 3,
                     maxLines = 5,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = TealPrimary,
-                        unfocusedBorderColor = InputBorder,
-                        focusedContainerColor = InputBackground,
-                        unfocusedContainerColor = InputBackground,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
                 )
             }
@@ -278,7 +274,7 @@ private fun AppointmentFormContent(
 
 @Composable
 private fun FieldLabel(text: String) {
-    Text(text, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+    Text(text, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
 }
 
 @Composable
@@ -287,11 +283,11 @@ private fun ReadOnlyField(value: String, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF0F0F0))
-            .border(1.dp, InputBorder, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
-        Text(value, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)
+        Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -306,15 +302,15 @@ private fun PickerField(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(InputBackground)
-            .border(1.dp, InputBorder, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(12.dp))
-        Text(text, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)
+        Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -338,14 +334,14 @@ private fun StudentDropdown(
             value = selectedName,
             onValueChange = {},
             readOnly = true,
-            placeholder = { Text(stringResource(R.string.appointment_student_placeholder), color = TextSecondary) },
+            placeholder = { Text(stringResource(R.string.appointment_student_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = TealPrimary,
-                unfocusedBorderColor = InputBorder,
-                focusedContainerColor = InputBackground,
-                unfocusedContainerColor = InputBackground,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             ),
             modifier = Modifier
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)

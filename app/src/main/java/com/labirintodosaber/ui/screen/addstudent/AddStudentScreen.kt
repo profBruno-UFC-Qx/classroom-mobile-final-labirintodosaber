@@ -74,11 +74,8 @@ import com.labirintodosaber.R
 import com.labirintodosaber.data.remote.FileUpload
 import com.labirintodosaber.ui.components.ProfileActionIcon
 import com.labirintodosaber.ui.theme.GradientBottom
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun AddStudentScreen(
@@ -131,18 +128,18 @@ private fun AddStudentContent(
                     Text(
                         text = stringResource(R.string.students_title),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
+                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         containerColor = GradientBottom,
@@ -217,14 +214,14 @@ private fun AddStudentContent(
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(color = InputBorder)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
                         text = stringResource(R.string.add_student_address_section),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -301,12 +298,12 @@ private fun AddStudentContent(
                         onClick = onCancelClick,
                         modifier = Modifier.weight(0.4f).height(48.dp),
                         shape = RoundedCornerShape(50.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.5.dp, TextPrimary),
+                        border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.onSurface),
                     ) {
                         Text(
                             text = stringResource(R.string.add_student_cancel),
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                     Button(
@@ -389,20 +386,20 @@ private fun PhotoSection(
                     shape = RoundedCornerShape(50.dp),
                     color = Color.Transparent,
                     onClick = onPickPhoto,
-                    modifier = Modifier.border(1.5.dp, TextPrimary, RoundedCornerShape(50.dp)),
+                    modifier = Modifier.border(1.5.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(50.dp)),
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(Icons.Outlined.Add, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Outlined.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(
                                 if (photoBytes != null) R.string.add_student_photo_change else R.string.add_student_photo_button,
                             ),
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -410,7 +407,7 @@ private fun PhotoSection(
                 Text(
                     text = stringResource(R.string.add_student_photo_hint),
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -438,7 +435,7 @@ private fun AdditionalInfoSection(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 1.dp,
     ) {
         Column {
@@ -453,7 +450,7 @@ private fun AdditionalInfoSection(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(TextSecondary),
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("+", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -464,18 +461,18 @@ private fun AdditionalInfoSection(
                         text = stringResource(R.string.add_student_additional_info_title),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
                         text = stringResource(R.string.add_student_additional_info_hint),
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Icon(
                     imageVector = if (expanded) Icons.Outlined.KeyboardArrowDown else Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = TextSecondary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -513,7 +510,7 @@ private fun FormField(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             if (required) {
                 Text(" *", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = Color(0xFFFB2C36))
@@ -535,15 +532,15 @@ private fun FormTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = {
-            Text(placeholder, style = MaterialTheme.typography.bodySmall, color = TextSecondary.copy(alpha = 0.5f))
+            Text(placeholder, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
         },
         singleLine = true,
         shape = RoundedCornerShape(50.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = TealPrimary,
-            unfocusedBorderColor = InputBorder,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         modifier = modifier.fillMaxWidth().height(52.dp),
     )
@@ -569,7 +566,7 @@ private fun GenderDropdown(
             onValueChange = {},
             readOnly = true,
             placeholder = {
-                Text(stringResource(R.string.add_student_gender_placeholder), style = MaterialTheme.typography.bodySmall, color = TextSecondary.copy(alpha = 0.5f))
+                Text(stringResource(R.string.add_student_gender_placeholder), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
             },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -578,9 +575,9 @@ private fun GenderDropdown(
             shape = RoundedCornerShape(50.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = TealPrimary,
-                unfocusedBorderColor = InputBorder,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             ),
             modifier = Modifier
                 .fillMaxWidth()

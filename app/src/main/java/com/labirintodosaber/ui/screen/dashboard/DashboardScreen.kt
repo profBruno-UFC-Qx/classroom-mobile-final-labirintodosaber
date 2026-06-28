@@ -58,7 +58,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -75,8 +74,6 @@ import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun DashboardScreen(
@@ -136,7 +133,7 @@ private fun DashboardContent(
                     Text(
                         text = stringResource(R.string.dashboard_title),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
@@ -144,7 +141,7 @@ private fun DashboardContent(
                         Icon(
                             imageVector = Icons.Outlined.Menu,
                             contentDescription = stringResource(R.string.dashboard_menu_desc),
-                            tint = TextPrimary,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
@@ -152,7 +149,7 @@ private fun DashboardContent(
                     ProfileActionIcon(onClick = onProfileClick)
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
             )
         },
@@ -165,7 +162,7 @@ private fun DashboardContent(
                 onReportsClick = onReportsClick,
             )
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -188,7 +185,7 @@ private fun DashboardContent(
                 text = stringResource(R.string.dashboard_today_sessions),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
 
@@ -198,7 +195,7 @@ private fun DashboardContent(
                 Text(
                     text = stringResource(R.string.dashboard_no_sessions_today),
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
             } else {
@@ -313,7 +310,7 @@ private fun SessionCard(
             .width(220.dp)
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(13.dp))
-            .background(Color(0xFFF6F8F8))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable { onClick() },
     ) {
         Box(
@@ -339,7 +336,7 @@ private fun SessionCard(
                     text = session.studentName,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -349,14 +346,14 @@ private fun SessionCard(
                 Icon(
                     imageVector = Icons.Outlined.AccessTime,
                     contentDescription = null,
-                    tint = TextSecondary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(10.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = session.time,
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Spacer(modifier = Modifier.height(2.dp))
@@ -364,14 +361,14 @@ private fun SessionCard(
                 Icon(
                     imageVector = Icons.Outlined.GridView,
                     contentDescription = null,
-                    tint = TextSecondary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(10.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = session.category,
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -380,7 +377,7 @@ private fun SessionCard(
             Text(
                 text = session.description,
                 style = MaterialTheme.typography.labelSmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -402,7 +399,7 @@ private fun PastSessionsCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -415,7 +412,7 @@ private fun PastSessionsCard(
                     text = stringResource(R.string.dashboard_recent_sessions),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = stringResource(R.string.dashboard_see_all),
@@ -432,7 +429,7 @@ private fun PastSessionsCard(
                 Text(
                     text = stringResource(R.string.dashboard_no_recent_sessions),
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 pastSessions.forEachIndexed { index, session ->
@@ -452,7 +449,7 @@ private fun PastSessionsCard(
                 text = stringResource(R.string.dashboard_recent_activities),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -480,11 +477,7 @@ private fun PastSessionRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(Color(0xFFF6F8F8), Color(0xFFFAFBFB), Color.White),
-                ),
-            )
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable { onClick() }
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -507,7 +500,7 @@ private fun PastSessionRow(
                 text = session.studentName,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -519,26 +512,26 @@ private fun PastSessionRow(
                 Icon(
                     imageVector = Icons.Outlined.CalendarToday,
                     contentDescription = null,
-                    tint = TextSecondary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(8.dp),
                 )
                 Text(
                     text = session.date,
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 9.sp,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Icon(
                     imageVector = Icons.Outlined.AccessTime,
                     contentDescription = null,
-                    tint = TextSecondary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(8.dp),
                 )
                 Text(
                     text = "${session.time} • ${session.duration}",
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 9.sp,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 TagChip(label = session.category)
             }
@@ -551,7 +544,7 @@ private fun PastSessionRow(
                 text = stringResource(R.string.dashboard_hit_rate_label),
                 style = MaterialTheme.typography.labelSmall,
                 fontSize = 7.sp,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = "${session.hitRatePercent}%",
@@ -566,7 +559,7 @@ private fun PastSessionRow(
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
             contentDescription = stringResource(R.string.dashboard_session_detail_desc),
-            tint = TextSecondary,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(16.dp),
         )
     }
@@ -597,7 +590,7 @@ private fun ActivityCard(
     ) {
         Surface(
             shape = RoundedCornerShape(8.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             shadowElevation = 1.dp,
             modifier = Modifier.size(26.dp),
         ) {
@@ -615,7 +608,7 @@ private fun ActivityCard(
             text = activity.name,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 9.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -624,7 +617,7 @@ private fun ActivityCard(
         Text(
             text = activity.description,
             style = MaterialTheme.typography.labelSmall,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 7.sp,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
@@ -645,7 +638,7 @@ private fun TagChip(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 1.dp,
     ) {
         Text(
@@ -653,7 +646,7 @@ private fun TagChip(
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,
             fontSize = 6.sp,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -678,7 +671,7 @@ private fun DashboardBottomBar(
     )
 
     NavigationBar(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 4.dp,
     ) {
         tabs.forEach { item ->
@@ -708,8 +701,8 @@ private fun DashboardBottomBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = TealPrimary,
                     selectedTextColor = TealPrimary,
-                    unselectedIconColor = TextSecondary,
-                    unselectedTextColor = TextSecondary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     indicatorColor = Color.Transparent,
                 ),
             )

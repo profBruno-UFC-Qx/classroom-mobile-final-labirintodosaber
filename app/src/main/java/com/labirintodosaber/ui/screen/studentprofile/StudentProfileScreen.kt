@@ -59,8 +59,6 @@ import com.labirintodosaber.ui.theme.GradientBottom
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun StudentProfileScreen(
@@ -99,7 +97,7 @@ private fun StudentProfileContent(
                     Text(
                         text = stringResource(R.string.students_title),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
@@ -107,14 +105,14 @@ private fun StudentProfileContent(
                         Icon(
                             Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(R.string.students_back_desc),
-                            tint = TextPrimary,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         containerColor = GradientBottom,
@@ -158,7 +156,7 @@ private fun StudentInfoCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -203,12 +201,12 @@ private fun StudentInfoCard(
                                 text = uiState.name,
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
                                 text = "${uiState.age} anos • ${uiState.gender}",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         Surface(
@@ -279,8 +277,8 @@ private fun StudentInfoCard(
 @Composable
 private fun InfoRow(label: String, value: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, fontSize = 8.sp, color = TextSecondary)
-        Text(text = value, style = MaterialTheme.typography.labelSmall, fontSize = 9.sp, color = TextPrimary)
+        Text(text = label, style = MaterialTheme.typography.labelSmall, fontSize = 8.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, style = MaterialTheme.typography.labelSmall, fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -301,7 +299,7 @@ private fun ProfileTabRow(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
@@ -323,7 +321,7 @@ private fun ProfileTabRow(
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 9.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected) TealPrimary else TextPrimary,
+                        color = if (isSelected) TealPrimary else MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -341,7 +339,7 @@ private fun ProgressTabContent(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -349,7 +347,7 @@ private fun ProgressTabContent(
                 text = stringResource(R.string.student_profile_progress_category_title),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.height(16.dp))
             uiState.categoryProgress.forEachIndexed { index, category ->
@@ -376,13 +374,13 @@ private fun CategoryProgressRow(
                 text = category.name,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 9.sp,
             )
             Text(
                 text = "${category.percent}%",
                 style = MaterialTheme.typography.labelSmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 8.sp,
             )
         }
@@ -429,7 +427,7 @@ private fun SessionsTabContent(
                             text = session.name,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 10.sp,
                         )
                         Text(
@@ -439,7 +437,7 @@ private fun SessionsTabContent(
                                 stringResource(R.string.student_profile_session_ongoing, session.date)
                             },
                             style = MaterialTheme.typography.labelSmall,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 8.sp,
                         )
                     }
@@ -453,7 +451,7 @@ private fun SessionsTabContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                         contentDescription = null,
-                        tint = TextSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -487,13 +485,13 @@ private fun DocumentsTabContent(
                             text = document.title,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 10.sp,
                         )
                         Text(
                             text = document.period,
                             style = MaterialTheme.typography.labelSmall,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 8.sp,
                         )
                     }
@@ -520,7 +518,7 @@ private fun TabCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -537,6 +535,6 @@ private fun EmptyTabMessage(text: String, modifier: Modifier = Modifier) {
             .height(88.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = text, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

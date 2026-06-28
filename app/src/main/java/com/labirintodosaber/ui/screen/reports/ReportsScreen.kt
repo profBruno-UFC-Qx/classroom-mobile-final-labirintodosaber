@@ -69,13 +69,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
-import com.labirintodosaber.ui.theme.InputBackground
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -147,18 +143,18 @@ private fun ReportsContent(
                     Text(
                         text = stringResource(R.string.reports_title),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Outlined.Menu, contentDescription = null, tint = TextPrimary)
+                        Icon(Icons.Outlined.Menu, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         bottomBar = {
@@ -168,7 +164,7 @@ private fun ReportsContent(
                 onStudentsClick = onStudentsClick,
             )
         },
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -187,7 +183,7 @@ private fun ReportsContent(
                         text = stringResource(R.string.reports_step_student),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
@@ -197,19 +193,19 @@ private fun ReportsContent(
                     placeholder = {
                         Text(
                             stringResource(R.string.reports_student_placeholder),
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     },
                     leadingIcon = {
-                        Icon(Icons.Outlined.Search, contentDescription = null, tint = TextSecondary)
+                        Icon(Icons.Outlined.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = TealPrimary,
-                        unfocusedBorderColor = InputBorder,
-                        focusedContainerColor = InputBackground,
-                        unfocusedContainerColor = InputBackground,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
@@ -220,7 +216,7 @@ private fun ReportsContent(
                     Text(
                         text = stringResource(R.string.reports_no_students),
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -244,7 +240,7 @@ private fun ReportsContent(
                         text = stringResource(R.string.reports_step_period),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
@@ -293,7 +289,7 @@ private fun ReportsContent(
                             text = stringResource(R.string.reports_session_preview_title),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
@@ -310,21 +306,21 @@ private fun ReportsContent(
                                     text = session.name,
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
-                                    color = TextPrimary,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = session.date,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = TextSecondary,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             Text(
                                 text = session.score,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -345,7 +341,7 @@ private fun ReportsContent(
                         text = stringResource(R.string.reports_content_title),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
@@ -497,7 +493,7 @@ private fun ReportSectionCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -537,8 +533,8 @@ private fun PeriodOptionRow(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
 ) {
-    val borderColor = if (selected) TealPrimary else InputBorder
-    val bgColor = if (selected) Color(0xFFEBFAF9) else Color.White
+    val borderColor = if (selected) TealPrimary else MaterialTheme.colorScheme.outline
+    val bgColor = if (selected) Color(0xFFEBFAF9) else MaterialTheme.colorScheme.surface
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -553,7 +549,7 @@ private fun PeriodOptionRow(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (selected) TealPrimary else TextPrimary,
+                color = if (selected) TealPrimary else MaterialTheme.colorScheme.onSurface,
             )
             if (subtitle != null) {
                 Text(
@@ -573,8 +569,8 @@ private fun StudentOptionRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val borderColor = if (selected) TealPrimary else InputBorder
-    val bgColor = if (selected) Color(0xFFEBFAF9) else Color.White
+    val borderColor = if (selected) TealPrimary else MaterialTheme.colorScheme.outline
+    val bgColor = if (selected) Color(0xFFEBFAF9) else MaterialTheme.colorScheme.surface
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -588,7 +584,7 @@ private fun StudentOptionRow(
         Icon(
             imageVector = Icons.Outlined.Person,
             contentDescription = null,
-            tint = if (selected) TealPrimary else TextSecondary,
+            tint = if (selected) TealPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp),
         )
         Spacer(modifier = Modifier.width(10.dp))
@@ -596,7 +592,7 @@ private fun StudentOptionRow(
             text = name,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-            color = if (selected) TealPrimary else TextPrimary,
+            color = if (selected) TealPrimary else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
         if (selected) {
@@ -627,7 +623,7 @@ private fun ReportCheckboxRow(
         Icon(
             imageVector = if (checked) Icons.Outlined.CheckBox else Icons.Outlined.CheckBoxOutlineBlank,
             contentDescription = null,
-            tint = if (checked) TealPrimary else TextSecondary,
+            tint = if (checked) TealPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(22.dp),
         )
         Spacer(modifier = Modifier.width(10.dp))
@@ -636,12 +632,12 @@ private fun ReportCheckboxRow(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -662,7 +658,7 @@ private fun ReportsBottomBar(
         NavItem(R.string.dashboard_tab_reports,    Icons.AutoMirrored.Outlined.Assignment, Icons.AutoMirrored.Outlined.Assignment, {},              true),
     )
 
-    NavigationBar(containerColor = Color.White, tonalElevation = 4.dp, modifier = modifier) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 4.dp, modifier = modifier) {
         items.forEach { item ->
             NavigationBarItem(
                 selected = item.selected,
@@ -679,8 +675,8 @@ private fun ReportsBottomBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = TealPrimary,
                     selectedTextColor = TealPrimary,
-                    unselectedIconColor = TextSecondary,
-                    unselectedTextColor = TextSecondary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     indicatorColor = Color.Transparent,
                 ),
             )

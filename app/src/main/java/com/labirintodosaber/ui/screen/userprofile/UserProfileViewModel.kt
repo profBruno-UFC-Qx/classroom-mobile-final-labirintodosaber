@@ -7,8 +7,10 @@ import com.labirintodosaber.data.remote.ApiResult
 import com.labirintodosaber.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,6 +37,10 @@ class UserProfileViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(UserProfileUiState())
     val uiState: StateFlow<UserProfileUiState> = _uiState.asStateFlow()
+
+    /** Usado pelo NavGraph para determinar a tela inicial no startup. null = ainda carregando. */
+    val isAuthenticated: StateFlow<Boolean?> = authRepository.isAuthenticated
+        .stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
 
     init {
         load()

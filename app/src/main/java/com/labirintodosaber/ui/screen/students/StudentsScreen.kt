@@ -65,12 +65,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
-import com.labirintodosaber.ui.theme.InputBorder
-import com.labirintodosaber.ui.theme.InputBackground
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun StudentsScreen(
@@ -131,7 +127,7 @@ private fun StudentsContent(
                     Text(
                         text = stringResource(R.string.students_title),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
@@ -139,20 +135,20 @@ private fun StudentsContent(
                         Icon(
                             Icons.Outlined.Menu,
                             contentDescription = stringResource(R.string.dashboard_menu_desc),
-                            tint = TextPrimary,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         bottomBar = {
             StudentsBottomBar(onHomeClick = onHomeClick, onActivitiesClick = onActivitiesClick, onReportsClick = onReportsClick)
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -190,19 +186,19 @@ private fun StudentsContent(
                         Text(
                             text = stringResource(R.string.students_search_placeholder),
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary.copy(alpha = 0.6f),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         )
                     },
                     leadingIcon = {
-                        Icon(Icons.Outlined.Search, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Outlined.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(50.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = TealPrimary,
-                        unfocusedBorderColor = InputBorder,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -212,7 +208,7 @@ private fun StudentsContent(
                 Text(
                     text = stringResource(R.string.students_count_label, filtered.size),
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -234,7 +230,7 @@ private fun StudentsContent(
                         Text(
                             text = uiState.errorMessage,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -273,7 +269,7 @@ private fun StudentCard(
     Card(
         modifier = modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -312,17 +308,17 @@ private fun StudentCard(
                         text = student.name,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
                         text = "${student.age} anos • ${student.gender}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = student.level,
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -337,13 +333,13 @@ private fun StudentCard(
                     text = stringResource(R.string.students_progress_label),
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 8.sp,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = "${student.progressPercent}%",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
@@ -386,7 +382,7 @@ private fun StudentsBottomBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 4.dp,
     ) {
         NavigationBarItem(
@@ -397,8 +393,8 @@ private fun StudentsBottomBar(
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = TealPrimary,
                 selectedTextColor = TealPrimary,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )
@@ -408,8 +404,8 @@ private fun StudentsBottomBar(
             icon = { Icon(Icons.AutoMirrored.Outlined.MenuBook, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_activities), style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )
@@ -421,8 +417,8 @@ private fun StudentsBottomBar(
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = TealPrimary,
                 selectedTextColor = TealPrimary,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )
@@ -432,8 +428,8 @@ private fun StudentsBottomBar(
             icon = { Icon(Icons.AutoMirrored.Outlined.Assignment, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_reports), style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )

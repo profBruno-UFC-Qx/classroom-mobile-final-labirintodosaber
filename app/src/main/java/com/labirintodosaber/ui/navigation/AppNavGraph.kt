@@ -67,8 +67,16 @@ fun AppNavGraph(
     val profileViewModel: UserProfileViewModel = hiltViewModel()
     val profileUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
+    val isAuthenticated by profileViewModel.isAuthenticated.collectAsStateWithLifecycle()
+
+    // Aguarda a leitura do DataStore antes de mostrar qualquer tela.
+    if (isAuthenticated == null) return
+
+    val startDestination = if (isAuthenticated == true) AppDestination.Dashboard.route
+    else AppDestination.Login.route
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: AppDestination.Login.route
+    val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
 
     // Routes where the drawer / profile sheet are accessible
     val mainRoutes = setOf(
@@ -116,7 +124,7 @@ fun AppNavGraph(
     ) {
         NavHost(
             navController = navController,
-            startDestination = AppDestination.Login.route,
+            startDestination = startDestination,
         ) {
             composable(AppDestination.Login.route) {
                 LoginScreen(

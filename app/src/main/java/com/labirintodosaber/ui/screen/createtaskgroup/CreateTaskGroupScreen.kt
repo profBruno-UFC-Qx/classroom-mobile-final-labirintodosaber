@@ -58,12 +58,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.CategorySelector
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun CreateTaskGroupScreen(
@@ -103,26 +100,26 @@ private fun CreateTaskGroupContent(
                         text = stringResource(R.string.create_task_group_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onCancelClick) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = Color.White, tonalElevation = 4.dp) {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 4.dp) {
                 NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Outlined.Menu, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_home), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
                 NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.AutoMirrored.Outlined.MenuBook, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_activities), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
                 NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Outlined.Folder, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_students), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
                 NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_reports), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -134,7 +131,7 @@ private fun CreateTaskGroupContent(
                     value = uiState.name,
                     onValueChange = { onAction(CreateTaskGroupAction.OnNameChange(it)) },
                     label = { Text(stringResource(R.string.create_task_group_name_label)) },
-                    placeholder = { Text("Ex: Alfabetização Divertida", color = TextSecondary) },
+                    placeholder = { Text("Ex: Alfabetização Divertida", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -143,7 +140,7 @@ private fun CreateTaskGroupContent(
             }
 
             item {
-                Text("Categoria *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text("Categoria *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(10.dp))
                 CategorySelector(
                     selected = uiState.category,
@@ -153,9 +150,9 @@ private fun CreateTaskGroupContent(
 
             // Atividades (obrigatório, mín. 1)
             item {
-                Text("Atividades *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text("Atividades *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Selecione as atividades que compõem este grupo", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text("Selecione as atividades que compõem este grupo", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             when {
@@ -166,7 +163,7 @@ private fun CreateTaskGroupContent(
                 }
                 uiState.tasksError != null -> item {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(uiState.tasksError, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                        Text(uiState.tasksError, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50.dp))
@@ -179,7 +176,7 @@ private fun CreateTaskGroupContent(
                     }
                 }
                 uiState.availableTasks.isEmpty() -> item {
-                    Text("Nenhuma atividade cadastrada ainda.", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                    Text("Nenhuma atividade cadastrada ainda.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 else -> item {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -209,7 +206,7 @@ private fun CreateTaskGroupContent(
                         onClick = onCancelClick,
                         modifier = Modifier.weight(1f).height(52.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
                     ) {
                         Text("Cancelar", fontWeight = FontWeight.SemiBold)
                     }
@@ -250,7 +247,7 @@ private fun TaskSelectRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .border(1.5.dp, if (selected) TealPrimary else InputBorder, RoundedCornerShape(12.dp))
+            .border(1.5.dp, if (selected) TealPrimary else MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             .clickable { onToggle() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -268,8 +265,8 @@ private fun TaskSelectRow(
             }
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(task.prompt, style = MaterialTheme.typography.bodyMedium, color = TextPrimary, maxLines = 2)
-            Text(task.categoryLabel, style = MaterialTheme.typography.labelSmall, color = TextSecondary, fontSize = 10.sp)
+            Text(task.prompt, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
+            Text(task.categoryLabel, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
         }
     }
 }
@@ -277,16 +274,16 @@ private fun TaskSelectRow(
 @Composable
 private fun fieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = TealPrimary,
-    unfocusedBorderColor = InputBorder,
-    focusedContainerColor = Color.White,
-    unfocusedContainerColor = Color.White,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
 )
 
 @Composable
 private fun navItemColors() = NavigationBarItemDefaults.colors(
     selectedIconColor = TealPrimary,
     selectedTextColor = TealPrimary,
-    unselectedIconColor = TextSecondary,
-    unselectedTextColor = TextSecondary,
+    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
     indicatorColor = Color.Transparent,
 )

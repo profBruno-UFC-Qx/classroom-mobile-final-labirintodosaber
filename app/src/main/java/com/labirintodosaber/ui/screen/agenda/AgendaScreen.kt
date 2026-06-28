@@ -50,8 +50,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun AgendaScreen(
@@ -93,16 +91,16 @@ private fun AgendaContent(
         modifier = modifier,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.agenda_title), style = MaterialTheme.typography.titleLarge, color = TextPrimary) },
+                title = { Text(stringResource(R.string.agenda_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
+                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         floatingActionButton = {
@@ -114,7 +112,7 @@ private fun AgendaContent(
                 text = { Text(stringResource(R.string.agenda_new)) },
             )
         },
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         when {
             uiState.isLoading -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -125,14 +123,14 @@ private fun AgendaContent(
                 modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             uiState.sections.isEmpty() -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Outlined.CalendarMonth, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(48.dp))
+                    Icon(Icons.Outlined.CalendarMonth, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(stringResource(R.string.agenda_empty), style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                    Text(stringResource(R.string.agenda_empty), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -169,7 +167,7 @@ private fun AppointmentCard(
     Card(
         modifier = modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -178,18 +176,18 @@ private fun AppointmentCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(item.studentName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text(item.studentName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 StatusBadge(label = item.statusLabel, colorHex = item.statusColorHex)
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Schedule, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(item.timeLabel, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)
+                Text(item.timeLabel, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
             }
             if (item.observation != null) {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(item.observation, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text(item.observation, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

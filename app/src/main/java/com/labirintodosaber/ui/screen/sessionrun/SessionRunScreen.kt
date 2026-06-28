@@ -61,8 +61,6 @@ import com.labirintodosaber.ui.screen.sessionselectstudent.SessionTopBar
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun SessionRunScreen(
@@ -115,7 +113,7 @@ private fun SessionRunContent(
                 SessionBottomBar()
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { padding ->
         when {
             uiState.isLoading -> Box(
@@ -130,7 +128,7 @@ private fun SessionRunContent(
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(uiState.errorMessage, color = TextSecondary, textAlign = TextAlign.Center)
+                    Text(uiState.errorMessage, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = { onAction(SessionRunAction.OnRetryLoad) },
@@ -181,7 +179,7 @@ private fun SessionRunContent(
                         text = task.prompt,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -248,7 +246,7 @@ private fun TimerRow(
             text = timerLabel,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.width(6.dp))
         Box(
@@ -298,7 +296,7 @@ private fun TaskImageCard(
                 .padding(8.dp)
                 .size(32.dp)
                 .clip(RoundedCornerShape(50.dp))
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
                 .clickable { onZoomClick() },
             contentAlignment = Alignment.Center,
         ) {
@@ -382,7 +380,7 @@ private fun AlternativeCard(
     modifier: Modifier = Modifier,
 ) {
     val borderColor = if (isSelected) TealPrimary else Color(0xFFE5E7EB)
-    val bgColor = if (isSelected) Color(0xFFD8F5F3) else Color.White
+    val bgColor = if (isSelected) Color(0xFFD8F5F3) else MaterialTheme.colorScheme.surface
 
     Box(
         modifier = modifier
@@ -402,7 +400,7 @@ private fun AlternativeCard(
             text = alternative.text,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
-            color = if (isSelected) TealPrimary else TextPrimary,
+            color = if (isSelected) TealPrimary else MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -416,7 +414,7 @@ private fun ConfirmAnswerButton(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -513,7 +511,7 @@ private fun FinishSessionButton(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -554,7 +552,7 @@ private fun CorrectAnswerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onNextActivity,
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(20.dp),
         icon = {
             Icon(
@@ -578,7 +576,7 @@ private fun CorrectAnswerDialog(
             Text(
                 text = stringResource(R.string.session_correct_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -611,7 +609,7 @@ private fun WrongAnswerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onRetry,
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(20.dp),
         icon = {
             Icon(
@@ -635,7 +633,7 @@ private fun WrongAnswerDialog(
             Text(
                 text = stringResource(R.string.session_wrong_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -707,14 +705,14 @@ private fun SessionFinishedContent(modifier: Modifier = Modifier) {
                 text = stringResource(R.string.session_finished),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.session_finished_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
         }

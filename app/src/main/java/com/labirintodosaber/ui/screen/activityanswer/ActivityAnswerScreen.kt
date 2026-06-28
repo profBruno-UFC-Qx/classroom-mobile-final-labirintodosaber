@@ -47,8 +47,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 private val AlternativeLabels = listOf("A", "B", "C", "D", "E", "F")
 
@@ -84,18 +82,18 @@ private fun ActivityAnswerContent(
                         text = stringResource(R.string.activity_detail_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back_button), tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back_button), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         when {
             uiState.isLoading -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -107,7 +105,7 @@ private fun ActivityAnswerContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(12.dp))
                 Box(
                     modifier = Modifier
@@ -134,7 +132,7 @@ private fun ActivityAnswerContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(20.dp),
                     ) {
                         Column {
@@ -157,7 +155,7 @@ private fun ActivityAnswerContent(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.AutoMirrored.Outlined.VolumeUp, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.size(6.dp))
-                                    Text("Possui áudio", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                                    Text("Possui áudio", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                             Spacer(modifier = Modifier.height(12.dp))
@@ -165,7 +163,7 @@ private fun ActivityAnswerContent(
                                 text = uiState.prompt,
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 lineHeight = 24.sp,
                             )
                         }
@@ -176,7 +174,7 @@ private fun ActivityAnswerContent(
                     Text(
                         text = stringResource(R.string.activity_detail_alternatives),
                         style = MaterialTheme.typography.labelLarge,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp),
                     )
                 }
@@ -203,7 +201,7 @@ private fun AlternativeRow(
     modifier: Modifier = Modifier,
 ) {
     val borderColor = if (isCorrect) Color(0xFF4CAF50) else Color(0xFFE5E7EB)
-    val bgColor = if (isCorrect) Color(0xFFE8F5E9) else Color.White
+    val bgColor = if (isCorrect) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.surface
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -225,13 +223,13 @@ private fun AlternativeRow(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = if (isCorrect) Color.White else TextSecondary,
+                color = if (isCorrect) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
         if (isCorrect) {

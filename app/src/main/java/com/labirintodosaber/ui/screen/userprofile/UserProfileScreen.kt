@@ -54,8 +54,6 @@ import coil.compose.AsyncImage
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun UserProfileScreen(
@@ -88,19 +86,19 @@ private fun UserProfileContent(
         modifier = modifier,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Meu Perfil", style = MaterialTheme.typography.titleLarge, color = TextPrimary) },
+                title = { Text("Meu Perfil", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back_button), tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back_button), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         when {
             uiState.isLoading -> Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -111,7 +109,7 @@ private fun UserProfileContent(
                 modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             else -> Column(
@@ -125,7 +123,7 @@ private fun UserProfileContent(
                 // Avatar + nome
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -153,20 +151,20 @@ private fun UserProfileContent(
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text(uiState.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text(uiState.email, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                        Text(uiState.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Text(uiState.email, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
 
                 // Informações
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
-                        Text("Informações", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("Informações", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         Spacer(modifier = Modifier.height(14.dp))
                         InfoRow(icon = Icons.Outlined.Person, label = "Nome", value = uiState.name)
                         Spacer(modifier = Modifier.height(14.dp))
@@ -183,12 +181,12 @@ private fun UserProfileContent(
                 // Aparência
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
-                        Text("Aparência", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("Aparência", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         Spacer(modifier = Modifier.height(14.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -202,12 +200,12 @@ private fun UserProfileContent(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("Tema escuro", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+                                Text("Tema escuro", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text(
                                     if (uiState.isDarkTheme) "Ativado" else "Desativado",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
-                                    color = TextPrimary,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                             Switch(
@@ -236,8 +234,8 @@ private fun InfoRow(
         Icon(icon, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.labelSmall, color = TextSecondary)
-            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = TextPrimary)
+            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

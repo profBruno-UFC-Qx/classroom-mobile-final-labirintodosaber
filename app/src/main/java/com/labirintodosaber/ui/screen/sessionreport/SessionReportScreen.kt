@@ -59,13 +59,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
-import com.labirintodosaber.ui.theme.InputBackground
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun SessionReportScreen(
@@ -105,24 +101,24 @@ private fun SessionReportContent(
                     Text(
                         text = stringResource(R.string.session_topbar_title),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
+                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         bottomBar = {
             SessionReportBottomBar(onHomeClick = onHomeClick)
         },
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         val hasData = uiState.totalQuestions > 0 ||
             uiState.categoryAccuracy.isNotEmpty() ||
@@ -140,7 +136,7 @@ private fun SessionReportContent(
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                    Text(uiState.errorMessage, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.height(12.dp))
                     Box(
                         modifier = Modifier
@@ -165,7 +161,7 @@ private fun SessionReportContent(
             // Header card
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
             ) {
                 Column(
@@ -217,8 +213,8 @@ private fun SessionReportContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_total_time),   value = uiState.totalTime,       valueColor = TextPrimary)
-                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_avg_response), value = uiState.avgResponseTime, valueColor = TextPrimary)
+                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_total_time),   value = uiState.totalTime,       valueColor = MaterialTheme.colorScheme.onSurface)
+                        TimeMetric(modifier = Modifier.weight(1f), label = stringResource(R.string.session_report_avg_response), value = uiState.avgResponseTime, valueColor = MaterialTheme.colorScheme.onSurface)
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -244,7 +240,7 @@ private fun SessionReportContent(
                         Text(
                             text = item.label,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
                             text = "${item.percent}%",
@@ -289,7 +285,7 @@ private fun SessionReportContent(
                                 Text(
                                     text = item.label,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = TextPrimary,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Spacer(modifier = Modifier.height(6.dp))
@@ -318,7 +314,7 @@ private fun SessionReportContent(
             // Relatório Descritivo
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -339,13 +335,13 @@ private fun SessionReportContent(
                                 text = stringResource(R.string.session_report_descriptive_title),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                         Text(
                             text = stringResource(R.string.session_report_char_count, uiState.descriptiveReport.length),
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Spacer(modifier = Modifier.height(10.dp))
@@ -356,7 +352,7 @@ private fun SessionReportContent(
                             Text(
                                 stringResource(R.string.session_report_descriptive_placeholder),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         },
                         modifier = Modifier
@@ -365,9 +361,9 @@ private fun SessionReportContent(
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = TealPrimary,
-                            unfocusedBorderColor = InputBorder,
-                            focusedContainerColor = InputBackground,
-                            unfocusedContainerColor = InputBackground,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         ),
                     )
                     uiState.savedMessage?.let { msg ->
@@ -424,7 +420,7 @@ private fun ReportCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(icon, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             }
             Spacer(modifier = Modifier.height(14.dp))
             content()
@@ -439,8 +435,8 @@ private fun HeaderMetric(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.Start) {
-        Text(text = label, style = MaterialTheme.typography.bodySmall, color = TextSecondary, fontSize = 10.sp)
-        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -452,7 +448,7 @@ private fun TimeMetric(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.Start) {
-        Text(text = label, style = MaterialTheme.typography.bodySmall, color = TextSecondary, fontSize = 10.sp)
+        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
         Text(
             text = value,
             style = MaterialTheme.typography.titleMedium,
@@ -475,7 +471,7 @@ private fun SessionReportBottomBar(
         NavItem(R.string.dashboard_tab_reports,    Icons.AutoMirrored.Outlined.Assignment, false, {}),
     )
 
-    NavigationBar(containerColor = Color.White, tonalElevation = 4.dp, modifier = modifier) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 4.dp, modifier = modifier) {
         items.forEach { item ->
             NavigationBarItem(
                 selected = item.selected,
@@ -485,8 +481,8 @@ private fun SessionReportBottomBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = TealPrimary,
                     selectedTextColor = TealPrimary,
-                    unselectedIconColor = TextSecondary,
-                    unselectedTextColor = TextSecondary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     indicatorColor = Color.Transparent,
                 ),
             )

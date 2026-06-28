@@ -66,13 +66,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
-import com.labirintodosaber.ui.theme.InputBackground
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun SessionSelectStudentScreen(
@@ -126,7 +122,7 @@ private fun SessionSelectStudentContent(
                 SessionBottomBar()
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -140,7 +136,7 @@ private fun SessionSelectStudentContent(
             Text(
                 text = stringResource(R.string.session_select_student_hint),
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -154,22 +150,22 @@ private fun SessionSelectStudentContent(
                     Text(
                         text = stringResource(R.string.session_search_student_placeholder),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = null,
-                        tint = TextSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = TealPrimary,
-                    unfocusedBorderColor = InputBorder,
-                    focusedContainerColor = InputBackground,
-                    unfocusedContainerColor = InputBackground,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -207,14 +203,14 @@ private fun StudentSelectRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val borderStroke = if (isSelected) BorderStroke(1.5.dp, TealPrimary) else BorderStroke(1.dp, InputBorder)
+    val borderStroke = if (isSelected) BorderStroke(1.5.dp, TealPrimary) else BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = borderStroke,
     ) {
@@ -240,17 +236,17 @@ private fun StudentSelectRow(
                     text = student.name,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = "${student.age} anos • ${student.gender}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = student.level,
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -300,7 +296,7 @@ internal fun PaginationRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
                 contentDescription = null,
-                tint = if (currentPage > 0) TextPrimary else TextSecondary,
+                tint = if (currentPage > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -309,7 +305,7 @@ internal fun PaginationRow(
                 Text(
                     text = "…",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp),
                 )
             } else {
@@ -318,7 +314,7 @@ internal fun PaginationRow(
                     text = "${pageIndex + 1}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = if (isCurrentPage) FontWeight.Bold else FontWeight.Normal,
-                    color = if (isCurrentPage) TealPrimary else TextSecondary,
+                    color = if (isCurrentPage) TealPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
                         .padding(horizontal = 6.dp)
                         .clickable { onPageChange(pageIndex) },
@@ -333,7 +329,7 @@ internal fun PaginationRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                 contentDescription = null,
-                tint = if (currentPage < totalPages - 1) TextPrimary else TextSecondary,
+                tint = if (currentPage < totalPages - 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -350,7 +346,7 @@ internal fun SessionActionButtonsRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -358,7 +354,7 @@ internal fun SessionActionButtonsRow(
         Surface(
             onClick = onBack,
             shape = RoundedCornerShape(50.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             shadowElevation = 2.dp,
         ) {
             Row(
@@ -368,14 +364,14 @@ internal fun SessionActionButtonsRow(
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                     contentDescription = null,
-                    tint = TextPrimary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(16.dp),
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = stringResource(R.string.session_back_button),
                     style = MaterialTheme.typography.labelMedium,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
@@ -426,7 +422,7 @@ internal fun SessionTopBar(
             Text(
                 text = stringResource(R.string.session_topbar_title),
                 style = MaterialTheme.typography.titleLarge,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         },
         navigationIcon = {
@@ -434,14 +430,14 @@ internal fun SessionTopBar(
                 Icon(
                     imageVector = Icons.Outlined.Menu,
                     contentDescription = stringResource(R.string.session_menu_desc),
-                    tint = TextPrimary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         },
         actions = {
             ProfileActionIcon(onClick = onProfileClick)
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
     )
 }
 
@@ -449,7 +445,7 @@ internal fun SessionTopBar(
 internal fun SessionBottomBar(modifier: Modifier = Modifier) {
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 4.dp,
     ) {
         NavigationBarItem(
@@ -460,8 +456,8 @@ internal fun SessionBottomBar(modifier: Modifier = Modifier) {
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = TealPrimary,
                 selectedTextColor = TealPrimary,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )
@@ -473,8 +469,8 @@ internal fun SessionBottomBar(modifier: Modifier = Modifier) {
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = TealPrimary,
                 selectedTextColor = TealPrimary,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )
@@ -486,8 +482,8 @@ internal fun SessionBottomBar(modifier: Modifier = Modifier) {
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = TealPrimary,
                 selectedTextColor = TealPrimary,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )
@@ -499,8 +495,8 @@ internal fun SessionBottomBar(modifier: Modifier = Modifier) {
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = TealPrimary,
                 selectedTextColor = TealPrimary,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent,
             ),
         )

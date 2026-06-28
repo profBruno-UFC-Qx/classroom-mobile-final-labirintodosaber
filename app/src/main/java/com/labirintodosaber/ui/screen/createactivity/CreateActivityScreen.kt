@@ -69,12 +69,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.data.remote.FileUpload
 import com.labirintodosaber.ui.components.CategorySelector
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealDark
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun CreateActivityScreen(
@@ -122,26 +119,26 @@ private fun CreateActivityContent(
                         text = stringResource(R.string.create_activity_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onCancelClick) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = Color.White, tonalElevation = 4.dp) {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 4.dp) {
                 NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Outlined.Menu, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_home), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
                 NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.AutoMirrored.Outlined.MenuBook, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_activities), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
                 NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Outlined.Folder, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_students), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
                 NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) }, label = { Text(stringResource(R.string.dashboard_tab_reports), style = MaterialTheme.typography.labelSmall) }, colors = navItemColors())
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -154,7 +151,7 @@ private fun CreateActivityContent(
                     value = uiState.name,
                     onValueChange = { onAction(CreateActivityAction.OnNameChange(it)) },
                     label = { Text(stringResource(R.string.create_activity_name_label)) },
-                    placeholder = { Text("Ex: Alfabetização Divertida", color = TextSecondary) },
+                    placeholder = { Text("Ex: Alfabetização Divertida", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -168,7 +165,7 @@ private fun CreateActivityContent(
                     text = stringResource(R.string.create_activity_category_label),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 CategorySelector(
@@ -209,7 +206,7 @@ private fun CreateActivityContent(
                     value = uiState.enunciado,
                     onValueChange = { onAction(CreateActivityAction.OnEnunciadoChange(it)) },
                     label = { Text("Enunciado *") },
-                    placeholder = { Text("Ex: Identifique a sílaba inicial da palavra mostrada na imagem", color = TextSecondary, fontSize = 12.sp) },
+                    placeholder = { Text("Ex: Identifique a sílaba inicial da palavra mostrada na imagem", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp) },
                     minLines = 3,
                     maxLines = 5,
                     modifier = Modifier.fillMaxWidth(),
@@ -224,19 +221,19 @@ private fun CreateActivityContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .border(1.dp, InputBorder, RoundedCornerShape(12.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = TealPrimary, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Alternativas de Resposta *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("Alternativas de Resposta *", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     }
                     Text(
                         "Preencha as alternativas e marque qual é a correta clicando no botão ao lado",
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 11.sp,
                     )
                     uiState.alternatives.forEachIndexed { index, alt ->
@@ -272,7 +269,7 @@ private fun CreateActivityContent(
                         onClick = onCancelClick,
                         modifier = Modifier.weight(1f).height(52.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
                     ) {
                         Text("Cancelar", fontWeight = FontWeight.SemiBold)
                     }
@@ -315,7 +312,7 @@ private fun MediaUploadField(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, if (hasFile) TealPrimary else InputBorder, RoundedCornerShape(12.dp))
+            .border(1.dp, if (hasFile) TealPrimary else MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -327,14 +324,14 @@ private fun MediaUploadField(
             Text(
                 text = fileName ?: label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (hasFile) TextPrimary else TextSecondary,
+                color = if (hasFile) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
             )
         }
         Icon(
             imageVector = if (hasFile) Icons.Outlined.CheckCircle else Icons.Outlined.Upload,
             contentDescription = null,
-            tint = if (hasFile) TealPrimary else TextSecondary,
+            tint = if (hasFile) TealPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp),
         )
     }
@@ -382,7 +379,7 @@ private fun AlternativeRow(
         OutlinedTextField(
             value = text,
             onValueChange = onTextChange,
-            placeholder = { Text("Alternativa $label", style = MaterialTheme.typography.bodySmall, color = TextSecondary) },
+            placeholder = { Text("Alternativa $label", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) },
             singleLine = true,
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(8.dp),
@@ -393,8 +390,8 @@ private fun AlternativeRow(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
-                .background(if (isCorrect) TealPrimary else Color.White)
-                .border(1.dp, if (isCorrect) TealPrimary else InputBorder, RoundedCornerShape(6.dp))
+                .background(if (isCorrect) TealPrimary else MaterialTheme.colorScheme.surface)
+                .border(1.dp, if (isCorrect) TealPrimary else MaterialTheme.colorScheme.outline, RoundedCornerShape(6.dp))
                 .clickable { onMarkCorrect() }
                 .padding(horizontal = 10.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center,
@@ -402,7 +399,7 @@ private fun AlternativeRow(
             Text(
                 text = "Marcar",
                 style = MaterialTheme.typography.labelSmall,
-                color = if (isCorrect) Color.White else TextSecondary,
+                color = if (isCorrect) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
             )
         }
@@ -412,16 +409,16 @@ private fun AlternativeRow(
 @Composable
 private fun fieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = TealPrimary,
-    unfocusedBorderColor = InputBorder,
-    focusedContainerColor = Color.White,
-    unfocusedContainerColor = Color.White,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
 )
 
 @Composable
 private fun navItemColors() = NavigationBarItemDefaults.colors(
     selectedIconColor = TealPrimary,
     selectedTextColor = TealPrimary,
-    unselectedIconColor = TextSecondary,
-    unselectedTextColor = TextSecondary,
+    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
     indicatorColor = Color.Transparent,
 )

@@ -56,11 +56,7 @@ import com.labirintodosaber.ui.screen.sessionselectstudent.PaginationRow
 import com.labirintodosaber.ui.screen.sessionselectstudent.SessionActionButtonsRow
 import com.labirintodosaber.ui.screen.sessionselectstudent.SessionBottomBar
 import com.labirintodosaber.ui.screen.sessionselectstudent.SessionTopBar
-import com.labirintodosaber.ui.theme.InputBackground
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun SessionConfigureScreen(
@@ -118,7 +114,7 @@ private fun SessionConfigureContent(
                 SessionBottomBar()
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -136,7 +132,7 @@ private fun SessionConfigureContent(
                 },
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -148,7 +144,7 @@ private fun SessionConfigureContent(
                     Text(
                         text = stringResource(R.string.session_name_placeholder),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 isError = uiState.sessionNameError,
@@ -158,10 +154,10 @@ private fun SessionConfigureContent(
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = TealPrimary,
-                    unfocusedBorderColor = InputBorder,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     errorBorderColor = Color(0xFFE53935),
-                    focusedContainerColor = InputBackground,
-                    unfocusedContainerColor = InputBackground,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     errorContainerColor = Color(0xFFFFF0F0),
                 ),
                 modifier = Modifier.fillMaxWidth(),
@@ -174,7 +170,7 @@ private fun SessionConfigureContent(
                 text = stringResource(R.string.session_content_hint),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -186,22 +182,22 @@ private fun SessionConfigureContent(
                     Text(
                         text = stringResource(R.string.session_search_content_placeholder),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = null,
-                        tint = TextSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = TealPrimary,
-                    unfocusedBorderColor = InputBorder,
-                    focusedContainerColor = InputBackground,
-                    unfocusedContainerColor = InputBackground,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -263,11 +259,11 @@ private fun ContentFilterRow(
             Surface(
                 onClick = { onFilterChange(option.filter) },
                 shape = RoundedCornerShape(50.dp),
-                color = if (isSelected) TealPrimary else Color.White,
+                color = if (isSelected) TealPrimary else MaterialTheme.colorScheme.surface,
                 shadowElevation = if (isSelected) 0.dp else 1.dp,
                 modifier = Modifier.border(
                     width = if (isSelected) 0.dp else 1.dp,
-                    color = if (isSelected) Color.Transparent else InputBorder,
+                    color = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline,
                     shape = RoundedCornerShape(50.dp),
                 ),
             ) {
@@ -275,7 +271,7 @@ private fun ContentFilterRow(
                     text = option.label,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSelected) Color.White else TextSecondary,
+                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                 )
             }
@@ -296,13 +292,13 @@ private fun ContentItemRow(
         ContentType.ACTIVITY -> Icons.AutoMirrored.Outlined.Assignment
     }
 
-    val borderColor = if (isSelected) TealPrimary else InputBorder
+    val borderColor = if (isSelected) TealPrimary else MaterialTheme.colorScheme.outline
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(14.dp),
@@ -330,12 +326,12 @@ private fun ContentItemRow(
                 text = item.title,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = item.description,
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
             )
             if (item.tags.isNotEmpty()) {
@@ -353,7 +349,7 @@ private fun ContentItemRow(
         Icon(
             imageVector = if (isSelected) Icons.Outlined.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
             contentDescription = null,
-            tint = if (isSelected) TealPrimary else TextSecondary,
+            tint = if (isSelected) TealPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(22.dp),
         )
     }
@@ -367,7 +363,7 @@ private fun ContentTag(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 1.dp,
     ) {
         Text(
@@ -375,7 +371,7 @@ private fun ContentTag(
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,
             fontSize = 10.sp,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

@@ -72,10 +72,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labirintodosaber.R
 import com.labirintodosaber.ui.components.ProfileActionIcon
-import com.labirintodosaber.ui.theme.InputBorder
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun ActivitiesScreen(
@@ -158,18 +155,18 @@ private fun ActivitiesContent(
                         text = stringResource(R.string.activities_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = TextPrimary)
+                        Icon(Icons.Outlined.Menu, contentDescription = stringResource(R.string.dashboard_menu_desc), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
                 actions = {
                     ProfileActionIcon(onClick = onProfileClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
             )
         },
         bottomBar = {
@@ -179,7 +176,7 @@ private fun ActivitiesContent(
                 onReportsClick = onReportsClick,
             )
         },
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -189,7 +186,7 @@ private fun ActivitiesContent(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
                     // "+ Criar novo conteúdo" com dropdown
@@ -236,19 +233,19 @@ private fun ActivitiesContent(
                             Text(
                                 text = "Buscar caderno por nome...",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         },
                         leadingIcon = {
-                            Icon(Icons.Outlined.Search, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                         },
                         singleLine = true,
                         shape = RoundedCornerShape(50.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = InputBorder,
-                            unfocusedBorderColor = InputBorder,
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
+                            focusedBorderColor = MaterialTheme.colorScheme.outline,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -283,7 +280,7 @@ private fun ActivitiesContent(
                         Text(
                             text = uiState.errorMessage,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Box(
                             modifier = Modifier
@@ -307,7 +304,7 @@ private fun ActivitiesContent(
                         Text(
                             text = stringResource(R.string.activities_empty),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -352,8 +349,8 @@ private fun TabChips(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50.dp))
-                    .background(if (isSelected) TealPrimary else Color.White)
-                    .border(1.dp, if (isSelected) TealPrimary else InputBorder, RoundedCornerShape(50.dp))
+                    .background(if (isSelected) TealPrimary else MaterialTheme.colorScheme.surface)
+                    .border(1.dp, if (isSelected) TealPrimary else MaterialTheme.colorScheme.outline, RoundedCornerShape(50.dp))
                     .clickable { onTabSelected(tab) }
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center,
@@ -362,7 +359,7 @@ private fun TabChips(
                     text = label,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    color = if (isSelected) Color.White else TextSecondary,
+                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -383,7 +380,7 @@ private fun ActivityCard(
     Card(
         modifier = modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Row(
@@ -413,13 +410,13 @@ private fun ActivityCard(
                     text = item.title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = item.subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp,
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -444,7 +441,7 @@ private fun CategoryPill(label: String, modifier: Modifier = Modifier) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 10.sp,
         )
     }
@@ -467,7 +464,7 @@ private fun ActivitiesBottomBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 4.dp,
     ) {
         NavigationBarItem(
@@ -505,7 +502,7 @@ private fun ActivitiesBottomBar(
 private fun navItemColors() = NavigationBarItemDefaults.colors(
     selectedIconColor = TealPrimary,
     selectedTextColor = TealPrimary,
-    unselectedIconColor = TextSecondary,
-    unselectedTextColor = TextSecondary,
+    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
     indicatorColor = Color.Transparent,
 )
