@@ -15,13 +15,13 @@ interface AppointmentRepository {
         studentId: String,
         scheduledAt: String,
         observation: String? = null,
-    ): ApiResult<Appointment>
+    ): ApiResult<Unit>
 
     suspend fun list(): ApiResult<List<Appointment>>
 
     suspend fun getById(id: String): ApiResult<Appointment>
 
-    suspend fun update(id: String, request: AppointmentUpdateRequest): ApiResult<Appointment>
+    suspend fun update(id: String, request: AppointmentUpdateRequest): ApiResult<Unit>
 
     suspend fun delete(id: String): ApiResult<Unit>
 }

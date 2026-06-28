@@ -18,8 +18,10 @@ import retrofit2.http.Path
  */
 interface AppointmentApi {
 
+    // create/update não desserializam o corpo: a resposta da API não segue o mesmo
+    // formato de Appointment (vem envelopada), então só interessa o sucesso da chamada.
     @POST("appointment/")
-    suspend fun create(@Body request: AppointmentCreateRequest): Appointment
+    suspend fun create(@Body request: AppointmentCreateRequest)
 
     @GET("appointment/")
     suspend fun list(): List<Appointment>
@@ -31,7 +33,7 @@ interface AppointmentApi {
     suspend fun update(
         @Path("id") id: String,
         @Body request: AppointmentUpdateRequest,
-    ): Appointment
+    )
 
     @DELETE("appointment/{id}")
     suspend fun delete(@Path("id") id: String)
