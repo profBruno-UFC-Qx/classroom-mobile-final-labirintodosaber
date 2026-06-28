@@ -8,6 +8,7 @@ import com.labirintodosaber.data.model.Task
 import com.labirintodosaber.data.model.TaskCategory
 import com.labirintodosaber.data.model.TaskNotebookSession
 import com.labirintodosaber.data.remote.getOrNull
+import com.labirintodosaber.data.repository.AppointmentRepository
 import com.labirintodosaber.data.repository.AuthRepository
 import com.labirintodosaber.data.repository.SessionRepository
 import com.labirintodosaber.data.repository.StudentRepository
@@ -35,6 +36,7 @@ class DashboardViewModel @Inject constructor(
     private val studentRepository: StudentRepository,
     private val sessionRepository: SessionRepository,
     private val taskRepository: TaskRepository,
+    private val appointmentRepository: AppointmentRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -76,6 +78,11 @@ class DashboardViewModel @Inject constructor(
             }
 
             val today = LocalDate.now()
+
+            // Quantidade de atendimentos agendados para hoje (Appointment API).
+            val todayAppointmentCount = appointmentRepository.list().getOrNull().orEmpty()
+                .count { it.scheduledAt.toLocalDate() == today }
+
             val todaySessions = allSessions
                 .filter { (session, _) -> session.startedAt.toLocalDate() == today }
                 .sortedBy { (session, _) -> session.startedAt }
@@ -94,7 +101,7 @@ class DashboardViewModel @Inject constructor(
                 it.copy(
                     isLoading = false,
                     userName = userName,
-                    todaySessionCount = todaySessions.size,
+                    todaySessionCount = todayAppointmentCount,
                     todaySessions = todaySessions,
                     pastSessions = pastSessions,
                     recentActivities = activities,
