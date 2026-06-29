@@ -33,8 +33,6 @@ class CreateNotebookViewModel @Inject constructor(
 
     fun onAction(action: CreateNotebookAction) {
         when (action) {
-            is CreateNotebookAction.OnNameChange ->
-                _uiState.update { it.copy(name = action.name, errorMessage = null) }
             is CreateNotebookAction.OnDescriptionChange ->
                 _uiState.update { it.copy(description = action.description, errorMessage = null) }
             is CreateNotebookAction.OnCategorySelect ->
@@ -87,7 +85,7 @@ class CreateNotebookViewModel @Inject constructor(
             .distinct()
 
         val validationError = when {
-            state.name.isBlank() -> "Informe o nome do caderno."
+            state.description.isBlank() -> "Informe a descrição do caderno."
             state.category == null -> "Selecione uma categoria."
             state.selectedGroupIds.isEmpty() -> "Selecione ao menos um grupo."
             derivedTasks.isEmpty() -> "Os grupos selecionados não têm atividades. Adicione atividades a eles primeiro."
@@ -101,7 +99,7 @@ class CreateNotebookViewModel @Inject constructor(
         val request = TaskNotebookCreateRequest(
             tasks = derivedTasks,
             category = checkNotNull(state.category),
-            description = state.name.trim(),
+            description = state.description.trim(),
             taskGroupsIds = state.selectedGroupIds.toList(),
         )
 
@@ -116,7 +114,6 @@ class CreateNotebookViewModel @Inject constructor(
 }
 
 data class CreateNotebookUiState(
-    val name: String = "",
     val description: String = "",
     val category: TaskCategory? = null,
     val availableGroups: List<GroupOption> = emptyList(),
@@ -137,7 +134,6 @@ data class GroupOption(
 )
 
 sealed interface CreateNotebookAction {
-    data class OnNameChange(val name: String) : CreateNotebookAction
     data class OnDescriptionChange(val description: String) : CreateNotebookAction
     data class OnCategorySelect(val category: TaskCategory) : CreateNotebookAction
     data class OnGroupToggle(val groupId: String) : CreateNotebookAction

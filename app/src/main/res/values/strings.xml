@@ -178,8 +178,7 @@
 
     <!-- Create Notebook -->
     <string name="create_notebook_title">Criar Caderno</string>
-    <string name="create_notebook_name_label">Nome do Caderno *</string>
-    <string name="create_notebook_description_label">Descrição</string>
+    <string name="create_notebook_description_label">Descrição *</string>
     <string name="create_notebook_button">Criar Caderno</string>
 
     <!-- Create Task Group -->

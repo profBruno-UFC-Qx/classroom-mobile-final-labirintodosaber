@@ -126,19 +126,6 @@ private fun CreateNotebookContent(
         ) {
             item {
                 OutlinedTextField(
-                    value = uiState.name,
-                    onValueChange = { onAction(CreateNotebookAction.OnNameChange(it)) },
-                    label = { Text(stringResource(R.string.create_notebook_name_label)) },
-                    placeholder = { Text("Ex: Alfabetização Divertida", color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = fieldColors(),
-                )
-            }
-
-            item {
-                OutlinedTextField(
                     value = uiState.description,
                     onValueChange = { onAction(CreateNotebookAction.OnDescriptionChange(it)) },
                     label = { Text(stringResource(R.string.create_notebook_description_label)) },
