@@ -2,7 +2,6 @@ package com.labirintodosaber.data.repository
 
 import com.labirintodosaber.data.model.NotebookWithGroups
 import com.labirintodosaber.data.model.TaskCategory
-import com.labirintodosaber.data.model.TaskNotebook
 import com.labirintodosaber.data.remote.ApiCaller
 import com.labirintodosaber.data.remote.ApiResult
 import com.labirintodosaber.data.remote.dto.TaskNotebookCreateRequest
@@ -13,7 +12,7 @@ import javax.inject.Inject
 /** Cadernos de tarefas atribuíveis a sessões. */
 interface TaskNotebookRepository {
 
-    suspend fun create(request: TaskNotebookCreateRequest): ApiResult<TaskNotebook>
+    suspend fun create(request: TaskNotebookCreateRequest): ApiResult<Unit>
 
     suspend fun list(
         id: String? = null,

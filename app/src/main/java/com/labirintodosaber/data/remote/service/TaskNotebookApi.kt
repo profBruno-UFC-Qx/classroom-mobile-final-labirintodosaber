@@ -17,7 +17,7 @@ import retrofit2.http.Query
 interface TaskNotebookApi {
 
     @POST("task-notebook/create")
-    suspend fun create(@Body request: TaskNotebookCreateRequest): TaskNotebook
+    suspend fun create(@Body request: TaskNotebookCreateRequest)
 
     @GET("task-notebook/")
     suspend fun list(
