@@ -373,14 +373,6 @@ private fun SessionCard(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = session.description,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
         }
     }
 }
@@ -533,7 +525,6 @@ private fun PastSessionRow(
                     fontSize = 9.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                TagChip(label = session.category)
             }
         }
 

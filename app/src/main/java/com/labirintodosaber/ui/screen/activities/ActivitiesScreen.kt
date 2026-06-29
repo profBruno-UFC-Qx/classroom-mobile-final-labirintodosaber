@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Menu
@@ -39,9 +40,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +58,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -135,6 +138,13 @@ private fun ActivitiesContent(
     modifier: Modifier = Modifier,
 ) {
     var showCreateMenu by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+    val dismissSheet: (() -> Unit) -> Unit = { action ->
+        scope.launch { sheetState.hide() }.invokeOnCompletion {
+            if (!sheetState.isVisible) { showCreateMenu = false; action() }
+        }
+    }
 
     val currentItems = when (uiState.selectedTab) {
         ActivitiesTab.ALL -> uiState.allItems
@@ -189,7 +199,7 @@ private fun ActivitiesContent(
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
-                    // "+ Criar novo conteúdo" com dropdown
+                    // "+ Criar novo conteúdo" — abre bottom sheet
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -202,23 +212,6 @@ private fun ActivitiesContent(
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = TealPrimary,
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showCreateMenu,
-                            onDismissRequest = { showCreateMenu = false },
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Criar Caderno") },
-                                onClick = { showCreateMenu = false; onCreateNotebookClick() },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Criar Grupo de Atividades") },
-                                onClick = { showCreateMenu = false; onCreateGroupClick() },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Criar Atividade") },
-                                onClick = { showCreateMenu = false; onCreateActivityClick() },
                             )
                         }
                     }
@@ -322,6 +315,20 @@ private fun ActivitiesContent(
                     )
                 }
             }
+        }
+    }
+
+    if (showCreateMenu) {
+        ModalBottomSheet(
+            onDismissRequest = { showCreateMenu = false },
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            CreateSheetContent(
+                onActivityClick = { dismissSheet { onCreateActivityClick() } },
+                onGroupClick = { dismissSheet { onCreateGroupClick() } },
+                onNotebookClick = { dismissSheet { onCreateNotebookClick() } },
+            )
         }
     }
 }
@@ -494,6 +501,115 @@ private fun ActivitiesBottomBar(
             icon = { Icon(Icons.Outlined.Article, contentDescription = null) },
             label = { Text(stringResource(R.string.dashboard_tab_reports), style = MaterialTheme.typography.labelSmall) },
             colors = navItemColors(),
+        )
+    }
+}
+
+// ── Create bottom sheet ───────────────────────────────────────────────────────
+
+@Composable
+private fun CreateSheetContent(
+    onActivityClick: () -> Unit,
+    onGroupClick: () -> Unit,
+    onNotebookClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 36.dp),
+    ) {
+        Text(
+            text = "O que deseja criar?",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Escolha o tipo de conteúdo",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        CreateOptionRow(
+            icon = Icons.Outlined.Article,
+            iconColor = Color(0xFF5CC8C0),
+            title = "Atividade",
+            subtitle = "Questão de múltipla escolha para o aluno responder",
+            onClick = onActivityClick,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        CreateOptionRow(
+            icon = Icons.Outlined.Folder,
+            iconColor = Color(0xFFE5A820),
+            title = "Grupo de Atividades",
+            subtitle = "Reúna atividades por tema ou nível de dificuldade",
+            onClick = onGroupClick,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        CreateOptionRow(
+            icon = Icons.AutoMirrored.Outlined.MenuBook,
+            iconColor = Color(0xFF50C878),
+            title = "Caderno",
+            subtitle = "Monte um caderno completo com grupos de atividades",
+            onClick = onNotebookClick,
+        )
+    }
+}
+
+@Composable
+private fun CreateOptionRow(
+    icon: ImageVector,
+    iconColor: Color,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(iconColor.copy(alpha = 0.18f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(16.dp),
         )
     }
 }

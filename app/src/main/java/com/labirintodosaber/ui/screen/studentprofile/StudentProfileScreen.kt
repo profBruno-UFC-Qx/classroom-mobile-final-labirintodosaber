@@ -24,7 +24,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -208,23 +207,6 @@ private fun StudentInfoCard(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                        }
-                        Surface(
-                            shape = RoundedCornerShape(13.dp),
-                            color = TealPrimary,
-                            shadowElevation = 2.dp,
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clickable { onAction(StudentProfileAction.OnEditClick) },
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Edit,
-                                    contentDescription = stringResource(R.string.student_profile_edit_desc),
-                                    tint = Color.White,
-                                    modifier = Modifier.size(15.dp),
-                                )
-                            }
                         }
                     }
 
