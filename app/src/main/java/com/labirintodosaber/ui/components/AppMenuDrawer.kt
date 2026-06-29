@@ -39,8 +39,6 @@ import androidx.compose.ui.unit.sp
 import com.labirintodosaber.ui.navigation.AppDestination
 import com.labirintodosaber.ui.theme.TealLight
 import com.labirintodosaber.ui.theme.TealPrimary
-import com.labirintodosaber.ui.theme.TextPrimary
-import com.labirintodosaber.ui.theme.TextSecondary
 
 @Composable
 fun AppMenuDrawer(
@@ -55,7 +53,7 @@ fun AppMenuDrawer(
         modifier = modifier
             .fillMaxHeight()
             .width(280.dp)
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 16.dp),
     ) {
         // Header
@@ -80,16 +78,16 @@ fun AppMenuDrawer(
                     text = "Labirinto do Saber",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
             IconButton(onClick = onClose) {
-                Icon(Icons.Outlined.Close, contentDescription = "Fechar menu", tint = TextSecondary)
+                Icon(Icons.Outlined.Close, contentDescription = "Fechar menu", tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        HorizontalDivider(color = Color(0xFFE5E7EB))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(modifier = Modifier.height(12.dp))
 
         val navItems = listOf(
@@ -110,7 +108,7 @@ fun AppMenuDrawer(
         }
 
         Spacer(modifier = Modifier.weight(1f))
-        HorizontalDivider(color = Color(0xFFE5E7EB))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(modifier = Modifier.height(12.dp))
 
         // Footer: user info
@@ -124,15 +122,15 @@ fun AppMenuDrawer(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFD0D0D0)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Outlined.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(userName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = TextPrimary)
-                Text(userEmail, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text(userName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                Text(userEmail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -147,8 +145,8 @@ private fun DrawerNavItem(
     modifier: Modifier = Modifier,
 ) {
     val bg = if (selected) TealLight.copy(alpha = 0.3f) else Color.Transparent
-    val textColor = if (selected) TealPrimary else TextPrimary
-    val iconTint = if (selected) TealPrimary else TextSecondary
+    val textColor = if (selected) TealPrimary else MaterialTheme.colorScheme.onSurface
+    val iconTint = if (selected) TealPrimary else MaterialTheme.colorScheme.onSurfaceVariant
 
     Row(
         modifier = modifier
